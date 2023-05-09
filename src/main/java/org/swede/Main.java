@@ -1,5 +1,6 @@
 package org.swede;
 
+import org.swede.ast.Utils;
 import org.swede.parser.Parser;
 
 import java.io.*;
@@ -10,8 +11,8 @@ public class Main {
         String code = readFromFile();
 
         Parser parser = new Parser(code);
-
-        parser.parse();
+        var documentNode = parser.parse();
+        Utils.printTree(documentNode);
     }
 
 

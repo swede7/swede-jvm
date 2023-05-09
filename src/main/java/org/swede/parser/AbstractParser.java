@@ -61,5 +61,5 @@ public abstract class AbstractParser {
         return true;
     }
 
-    abstract void parse();
+    abstract AbstractNode parse();
 }

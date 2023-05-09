@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -38,5 +39,9 @@ public abstract class AbstractNode {
 
     public void addChild(AbstractNode child) {
         children.add(child);
+    }
+
+    public void addChildren(Collection<AbstractNode> child) {
+        children.addAll(child);
     }
 }

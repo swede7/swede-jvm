@@ -13,19 +13,45 @@ public class Parser extends AbstractParser {
 
 
     @Override
-    public void parse() {
-        parseFeature();
-        System.out.println(nodes);
+    public DocumentNode parse() {
+        if (!parseDocument()) {
+            throw new RuntimeException("parsing error");
+        }
+
+        if (nodes.size() != 1) {
+            throw new RuntimeException("parsing error");
+        }
+        return (DocumentNode) nodes.get(0);
     }
 
-    private boolean parseFeature() {
+    private boolean parseDocument() {
         int startPos = pos;
+        int startNodesCount = nodes.size();
+        DocumentNode documentNode = new DocumentNode();
 
         if (parseTags() && parseAndSkipString("Feature:") && parseText() && parseMany(this::parseExpression)) {
+            int endNodesCount = nodes.size();
+            for (int i = startNodesCount; i < endNodesCount; i++) {
+                documentNode.addChild(nodes.get(i));
+            }
+
+            for (int i = startNodesCount; i < endNodesCount; i++) {
+                nodes.remove(nodes.size() - 1);
+            }
+            nodes.add(documentNode);
             return true;
         }
 
         if (parseAndSkipString("Feature:") && parseText() && parseMany(this::parseExpression)) {
+            int endNodesCount = nodes.size();
+            for (int i = startNodesCount; i < endNodesCount; i++) {
+                documentNode.addChild(nodes.get(i));
+            }
+
+            for (int i = startNodesCount; i < endNodesCount; i++) {
+                nodes.remove(nodes.size() - 1);
+            }
+            nodes.add(documentNode);
             return true;
         }
 
