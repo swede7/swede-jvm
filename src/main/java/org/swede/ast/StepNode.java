@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class StepNode extends AbstractNode{
+public class StepNode extends AbstractNode {
     private String text;
 }

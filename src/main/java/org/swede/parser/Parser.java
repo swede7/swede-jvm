@@ -4,7 +4,7 @@ import org.swede.ast.*;
 
 public class Parser extends AbstractParser {
 
-    public static final char TAG_CHAR = '@';
+    private static final char TAG_CHAR = '@';
 
 
     public Parser(String code) {
@@ -18,56 +18,56 @@ public class Parser extends AbstractParser {
             throw new RuntimeException("parsing error");
         }
 
-        if (nodes.size() != 1) {
+        if (getNodes().size() != 1) {
             throw new RuntimeException("parsing error");
         }
-        return (DocumentNode) nodes.get(0);
+        return getNode(0, DocumentNode.class);
     }
 
     private boolean parseDocument() {
-        int startPos = pos;
-        int startNodesCount = nodes.size();
+        int startPos = pos();
+        int startNodesCount = getNodes().size();
         DocumentNode documentNode = new DocumentNode();
 
         if (parseTags() && parseAndSkipString("Feature:") && parseText() && parseMany(this::parseExpression)) {
-            int endNodesCount = nodes.size();
+            int endNodesCount = getNodes().size();
             for (int i = startNodesCount; i < endNodesCount; i++) {
-                documentNode.addChild(nodes.get(i));
+                documentNode.addChild(getNode(i));
             }
 
             for (int i = startNodesCount; i < endNodesCount; i++) {
-                nodes.remove(nodes.size() - 1);
+                removeNode(getNodes().size() - 1);
             }
-            nodes.add(documentNode);
+            addNode(documentNode);
             return true;
         }
 
         if (parseAndSkipString("Feature:") && parseText() && parseMany(this::parseExpression)) {
-            int endNodesCount = nodes.size();
+            int endNodesCount = getNodes().size();
             for (int i = startNodesCount; i < endNodesCount; i++) {
-                documentNode.addChild(nodes.get(i));
+                documentNode.addChild(getNode(i));
             }
 
             for (int i = startNodesCount; i < endNodesCount; i++) {
-                nodes.remove(nodes.size() - 1);
+                removeNode(getNodes().size() - 1);
             }
-            nodes.add(documentNode);
+            addNode(documentNode);
             return true;
         }
 
         // rollback
-        pos = startPos;
+        pos(startPos);
         return false;
 
     }
 
     // _ -> (CommentNode | ScenarioNode)*
     private boolean parseExpression() {
-        int startPos = pos;
+        int startPos = pos();
 
         if (isEOF() || !parseMany(() -> parseComment() || parseScenario() || parseAndSkipNL())) {
             // else rollback
-            pos = startPos;
+            pos(startPos);
             return false;
         }
 
@@ -75,23 +75,23 @@ public class Parser extends AbstractParser {
     }
 
     private boolean parseAndSkipNL() {
-        int startPos = pos;
+        int startPos = pos();
 
         if (!isEOF() && parseMany(() -> parseAndSkipChar(' ') || parseAndSkipChar('\n') || parseAndSkipChar('\r'))) {
             return true;
         }
         // else rollback
-        pos = startPos;
+        pos(startPos);
         return false;
     }
 
     // _ -> TagNode+
     private boolean parseTags() {
-        int startPos = pos;
+        int startPos = pos();
 
         if (!parseTag()) {
             // else rollback
-            pos = startPos;
+            pos(startPos);
             return false;
         }
 
@@ -101,17 +101,17 @@ public class Parser extends AbstractParser {
             return true;
         }
         //rollback
-        pos = startPos;
+        pos(startPos);
         return false;
     }
 
     // _ -> TagNode
     private boolean parseTag() {
-        int startPos = pos;
+        int startPos = pos();
 
         if (isEOF() || !parseAndSkipChar(TAG_CHAR)) {
             //rollback
-            pos = startPos;
+            pos(startPos);
             return false;
         }
 
@@ -123,116 +123,100 @@ public class Parser extends AbstractParser {
 
         if (builder.length() == 0) {
             //rollback
-            pos = startPos;
+            pos(startPos);
             return false;
         }
 
         var tagNode = new TagNode(builder.toString());
-        nodes.add(tagNode);
+        addNode(tagNode);
         return true;
     }
 
     // (TagNode+)? TextNode StepNode* -> ScenarioNode
     private boolean parseScenario() {
-        int startPos = pos;
-        int startNodesCount = nodes.size();
+        int startPos = pos();
+        int startNodesCount = getNodes().size();
 
         var scenarioNode = new ScenarioNode();
 
         // optional - parse tags
         if (parseTags()) {
-            int endNodesCount = nodes.size();
+            int endNodesCount = getNodes().size();
 
             for (int i = startNodesCount; i < endNodesCount; i++) {
-                var tagNode = (TagNode) nodes.get(i);
+                var tagNode = (TagNode) getNode(i);
                 scenarioNode.addChild(tagNode);
             }
 
             for (int i = 0; i < endNodesCount - startNodesCount; i++) {
-                nodes.remove(nodes.size() - 1);
+                removeNode(getNodes().size() - 1);
             }
         }
 
         if (parseAndSkipString("Scenario:") && parseText() && parseMany(this::parseStep)) {
-            int endNodesCount = nodes.size();
+            int endNodesCount = getNodes().size();
 
-            var textNode = (TextNode) nodes.get(startNodesCount);
+            var textNode = getNode(startNodesCount, TextNode.class);
             scenarioNode.addChild(textNode);
 
             for (int i = startNodesCount + 1; i < endNodesCount - 1; i++) {
-                var stepNode = (StepNode) nodes.get(i);
+                var stepNode = (StepNode) getNode(i);
                 scenarioNode.addChild(stepNode);
             }
 
             for (int i = 0; i < endNodesCount - startNodesCount; i++) {
-                nodes.remove(nodes.size() - 1);
+                removeNode(getNodes().size() - 1);
             }
 
-            nodes.add(scenarioNode);
+            addNode(scenarioNode);
             return true;
         }
 
         // else revert
-        pos = startPos;
+        pos(startPos);
 
-        while (startNodesCount != nodes.size()) {
-            nodes.remove(nodes.size() - 1);
+        while (startNodesCount != getNodes().size()) {
+            removeNode(getNodes().size() - 1);
         }
 
         return false;
     }
 
-    private boolean parseAndSkipString(String s) {
-        int startPos = pos;
-
-        int i = 0;
-        while (!isEOF() && i < s.length() && s.charAt(i) == peek()) {
-            pos++;
-            i++;
-        }
-
-        if (i == s.length()) {
-            return true;
-        }
-        // else rollback
-        pos = startPos;
-        return false;
-    }
 
     // TextNode -> StepNode
     private boolean parseStep() {
-        int startPos = pos;
+        int startPos = pos();
 
         if (!parseAndSkipChar('-') || !parseText()) {
             //rollback
-            pos = startPos;
+            pos(startPos);
             return false;
         }
 
-        var textNode = (TextNode) nodes.get(nodes.size() - 1);
-        nodes.remove(nodes.size() - 1);
+        var textNode = getNode(getNodes().size() - 1, TextNode.class);
+        removeNode(getNodes().size() - 1);
 
         var stepNode = new StepNode(textNode.getText());
-        nodes.add(stepNode);
+        addNode(stepNode);
         return true;
     }
 
 
     // TextNode -> CommentNode
     private boolean parseComment() {
-        int startPos = pos;
+        int startPos = pos();
 
         if (!parseAndSkipChar('#') || !parseText()) {
             //rollback
-            pos = startPos;
+            pos(startPos);
             return false;
         }
 
-        var textNode = (TextNode) nodes.get(nodes.size() - 1);
-        nodes.remove(nodes.size() - 1);
+        var textNode = getNode(getNodes().size() - 1, TextNode.class);
+        removeNode(getNodes().size() - 1);
 
         var commentNode = new CommentNode(textNode.getText());
-        nodes.add(commentNode);
+        addNode(commentNode);
         return true;
     }
 
@@ -251,7 +235,7 @@ public class Parser extends AbstractParser {
         }
 
         var textNode = new TextNode(builder.toString());
-        nodes.add(textNode);
+        addNode(textNode);
         return true;
     }
 

@@ -1,6 +1,10 @@
 package org.swede.ast;
 
-public class Utils {
+public final class Utils {
+
+    private Utils() {
+    }
+
     public static void printTree(AbstractNode node) {
         printTree(node, 0);
     }
