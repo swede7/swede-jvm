@@ -4,13 +4,11 @@ import org.junit.jupiter.api.Test;
 import org.swede.Main;
 import org.swede.ast.CommentNode;
 import org.swede.ast.ScenarioNode;
-import org.swede.ast.TagNode;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

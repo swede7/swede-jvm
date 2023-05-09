@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class Interpreter {
 
-    private Map<String, Action> actionMap = new HashMap<>();
+    private final Map<String, Action> actionMap = new HashMap<>();
 
     public void registerAction(String actionName, Action action) {
         actionMap.put(actionName, action);
