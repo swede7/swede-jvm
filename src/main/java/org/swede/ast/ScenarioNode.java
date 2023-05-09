@@ -10,18 +10,18 @@ import java.util.stream.Collectors;
 @EqualsAndHashCode(callSuper = true)
 public class ScenarioNode extends AbstractNode {
 
-    private String getDescription() {
+    public String getDescription() {
         return getChildByClass(TextNode.class).get().getText();
     }
 
-    private List<String> getTags() {
+    public List<String> getTags() {
         var tags = getChildrenByClass(TagNode.class);
         return tags.stream()
                 .map(TagNode::getName)
                 .collect(Collectors.toList());
     }
 
-    private List<String> getSteps() {
+    public List<String> getSteps() {
         var steps = getChildrenByClass(StepNode.class);
         return steps.stream()
                 .map(StepNode::getText)

@@ -159,7 +159,7 @@ public class Parser extends AbstractParser {
             var textNode = getNode(startNodesCount, TextNode.class);
             scenarioNode.addChild(textNode);
 
-            for (int i = startNodesCount + 1; i < endNodesCount - 1; i++) {
+            for (int i = startNodesCount + 1; i < endNodesCount; i++) {
                 var stepNode = (StepNode) getNode(i);
                 scenarioNode.addChild(stepNode);
             }

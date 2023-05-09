@@ -1,9 +1,11 @@
 package org.swede;
 
-import org.swede.ast.Utils;
+import org.swede.interpreter.ActionResult;
+import org.swede.interpreter.Interpreter;
 import org.swede.parser.Parser;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 public class Main {
@@ -12,7 +14,11 @@ public class Main {
 
         Parser parser = new Parser(code);
         var documentNode = parser.parse();
-        Utils.printTree(documentNode);
+
+
+        Interpreter interpreter = new Interpreter();
+        interpreter.registerAction(" Print hello", context -> new ActionResult(ActionResult.ResultStatus.OK, "hello world, man!"));
+        interpreter.execute(documentNode);
     }
 
 
