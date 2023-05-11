@@ -17,7 +17,7 @@ public class Main {
 
 
         Interpreter interpreter = new Interpreter();
-        interpreter.registerAction(" Print hello", context -> new ActionResult(ActionResult.ResultStatus.OK, "hello world, man!"));
+        interpreter.registerActionClass(ExampleStepImpl.class);
         interpreter.execute(documentNode);
     }
 
