@@ -1,7 +1,7 @@
 package org.swede.parser;
 
+import com.sun.tools.javac.Main;
 import org.junit.jupiter.api.Test;
-import org.swede.Main;
 import org.swede.ast.CommentNode;
 import org.swede.ast.ScenarioNode;
 

@@ -1,6 +1,5 @@
-package org.swede;
+package org.swede.demo;
 
-import org.swede.interpreter.ActionResult;
 import org.swede.interpreter.Interpreter;
 import org.swede.parser.Parser;
 
@@ -15,7 +14,6 @@ public class Main {
         Parser parser = new Parser(code);
         var documentNode = parser.parse();
 
-
         Interpreter interpreter = new Interpreter();
         interpreter.registerActionClass(ExampleStepImpl.class);
         interpreter.execute(documentNode);
@@ -24,6 +22,7 @@ public class Main {
 
     private static String readFromFile() throws IOException {
         InputStream is = Main.class.getClassLoader().getResourceAsStream("example.feature");
+        //noinspection DataFlowIssue
         String text = new String(is.readAllBytes(), StandardCharsets.UTF_8);
         is.close();
         return text;

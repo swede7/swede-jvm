@@ -1,4 +1,4 @@
-package org.swede;
+package org.swede.demo;
 
 import org.swede.api.Step;
 

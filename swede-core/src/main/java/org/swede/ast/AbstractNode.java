@@ -18,6 +18,7 @@ public abstract class AbstractNode {
     private List<AbstractNode> children = new ArrayList<>();
 
     public <T extends AbstractNode> List<T> getChildrenByClass(Class<T> classSelector) {
+        //noinspection unchecked
         return children.stream()
                 .filter(abstractNode -> abstractNode.getClass().isAssignableFrom(classSelector))
                 .map(abstractNode -> (T) abstractNode)

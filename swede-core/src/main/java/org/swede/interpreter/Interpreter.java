@@ -6,9 +6,7 @@ import org.swede.ast.ScenarioNode;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class Interpreter {
@@ -17,16 +15,11 @@ public class Interpreter {
 
     public void registerActionClass(Class<?> actionClass) {
 
-        Object actionClassObject = null;
+        Object actionClassObject;
         try {
             actionClassObject = actionClass.getDeclaredConstructor().newInstance();
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchMethodException e) {
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
 
