@@ -12,6 +12,7 @@ jobs:
         with:
           java-version: 17
       - name: run tests
+        working-directory: ./swede
         run: mvn -B test --file pom.xml
 
 
@@ -24,6 +25,7 @@ jobs:
         with:
           java-version: 15
       - name: run checkstyle
+        working-directory: ./swede
         run: mvn -B checkstyle:check --file pom.xml
 
 
@@ -36,4 +38,5 @@ jobs:
         with:
           java-version: 15
       - name: run spotbugs
+        working-directory: ./swede
         run: mvn -B spotbugs:check --file pom.xml
