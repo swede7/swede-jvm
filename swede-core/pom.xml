@@ -8,7 +8,7 @@
         <groupId>org.swede</groupId>
         <artifactId>swede</artifactId>
         <version>1.0-SNAPSHOT</version>
-        <relativePath>../swede</relativePath>
+        <relativePath>../swede/pom.xml</relativePath>
     </parent>
 
     <artifactId>swede-core</artifactId>
