@@ -3,9 +3,12 @@ package org.swede.interpreter;
 import org.swede.api.Step;
 import org.swede.ast.DocumentNode;
 import org.swede.ast.ScenarioNode;
+import org.swede.interpreter.context.FeatureContext;
+import org.swede.interpreter.context.ScenarioContext;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,9 +39,23 @@ public class Interpreter {
     }
 
     private Action createAction(Method method, Object actionClassObj) {
-        return context -> {
+        return (featureContext, scenarioContext) -> {
             try {
-                method.invoke(actionClassObj);
+                var methodParameters = method.getParameters();
+
+                var args = new ArrayList<>();
+
+                for (var parameter : methodParameters) {
+                    if (parameter.getType().equals(FeatureContext.class)) {
+                        args.add(featureContext);
+                    } else if (parameter.getType().equals(ScenarioContext.class)) {
+                        args.add(scenarioContext);
+                    } else {
+                        throw new RuntimeException("Unsupported parameter type");
+                    }
+                }
+
+                method.invoke(actionClassObj, args.toArray());
             } catch (InvocationTargetException e) {
                 return new ActionResult(ActionResult.ResultStatus.ERROR);
             } catch (Exception e) {
@@ -49,24 +66,27 @@ public class Interpreter {
     }
 
     public void execute(DocumentNode node) {
+        var featureContext = new FeatureContext();
+
         for (var scenarioNode : node.getScenariosNodes()) {
-            executeScenario(scenarioNode);
+            executeScenario(scenarioNode, featureContext);
         }
     }
 
-    private void executeScenario(ScenarioNode scenario) {
+    private void executeScenario(ScenarioNode scenario, FeatureContext featureContext) {
         System.out.println("executing scenario: " + scenario.getDescription());
-        var context = new ActionContext();
 
+        var scenarioContext = new ScenarioContext();
         for (var stepNode : scenario.getSteps()) {
-            executeStep(stepNode, context);
+            executeStep(stepNode, scenarioContext, featureContext);
         }
     }
 
-    private void executeStep(String stepName, ActionContext context) {
+    private void executeStep(String stepName, ScenarioContext scenarioContext, FeatureContext featureContext) {
         System.out.println("executing step: " + stepName);
+
         var action = actionMap.get(stepName);
-        var result = action.execute(context);
+        var result = action.execute(featureContext, scenarioContext);
         System.out.printf("status: %s, message: %s%n", result.getStatus(), result.getMessage());
     }
 }

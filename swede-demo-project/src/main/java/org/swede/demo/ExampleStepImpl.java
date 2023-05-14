@@ -1,10 +1,22 @@
 package org.swede.demo;
 
 import org.swede.api.Step;
+import org.swede.interpreter.context.ScenarioContext;
 
 public class ExampleStepImpl {
-    @Step("Print hello")
-    public void printHello() {
-        System.out.println("hello world");
+    @Step("Print scenario var")
+    public void printHello(ScenarioContext scenarioContext) {
+        var scenarioVar = scenarioContext.get("var", Integer.class);
+        System.out.println(scenarioVar);
+    }
+
+    @Step("Set scenario var = 5")
+    public void setScenarioVar5(ScenarioContext scenarioContext) {
+        scenarioContext.put("var", 5);
+    }
+
+    @Step("Set scenario var = 3")
+    public void setScenarioVar3(ScenarioContext scenarioContext) {
+        scenarioContext.put("var", 3);
     }
 }
