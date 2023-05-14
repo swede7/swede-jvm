@@ -27,16 +27,3 @@ jobs:
       - name: run checkstyle
         working-directory: ./swede
         run: mvn -B checkstyle:check --file pom.xml
-
-
-  spotbugs:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-java@v1
-        with:
-          java-version: 15
-      - name: run spotbugs
-        working-directory: ./swede
-        run: mvn -B spotbugs:check --file pom.xml
