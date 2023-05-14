@@ -21,7 +21,7 @@ public class Main {
 
 
     private static String readFromFile() throws IOException {
-        InputStream is = Main.class.getClassLoader().getResourceAsStream("example.feature");
+        InputStream is = Main.class.getClassLoader().getResourceAsStream("example.speca");
         //noinspection DataFlowIssue
         String text = new String(is.readAllBytes(), StandardCharsets.UTF_8);
         is.close();

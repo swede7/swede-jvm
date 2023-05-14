@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ParserTest {
     @Test
     public void test() throws IOException {
-        String code = readFromFile("code/good-case.feature");
+        String code = readFromFile("code/good-case.speca");
 
         Parser parser = new Parser(code);
         var documentNode = parser.parse();
