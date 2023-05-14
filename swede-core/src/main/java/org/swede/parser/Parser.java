@@ -65,7 +65,7 @@ public class Parser extends AbstractParser {
     private boolean parseExpression() {
         int startPos = pos();
 
-        if (isEOF() || !parseMany(() -> parseComment() || parseScenario() || parseAndSkipNL())) {
+        if (isEOF() || !parseMany(() -> parseComment() || parseScenario() || parseAndSkipWS())) {
             // else rollback
             pos(startPos);
             return false;
@@ -74,10 +74,10 @@ public class Parser extends AbstractParser {
         return true;
     }
 
-    private boolean parseAndSkipNL() {
+    private boolean parseAndSkipWS() {
         int startPos = pos();
 
-        if (!isEOF() && parseMany(() -> parseAndSkipChar(' ') || parseAndSkipChar('\n') || parseAndSkipChar('\r'))) {
+        if (!isEOF() && parseMany(() -> parseAndSkipChar(' ') || parseAndSkipEL())) {
             return true;
         }
         // else rollback
@@ -97,7 +97,7 @@ public class Parser extends AbstractParser {
 
         parseMany(() -> parseAndSkipChar(' ') || parseTag());
 
-        if (parseAndSkipChar('\n')) {
+        if (parseAndSkipEL()) {
             return true;
         }
         //rollback
@@ -224,10 +224,8 @@ public class Parser extends AbstractParser {
     private boolean parseText() {
         StringBuilder builder = new StringBuilder();
 
-        char currentChar = next();
-        while (!isEOF() && currentChar != '\n') {
-            builder.append(currentChar);
-            currentChar = next();
+        while (!isEOF() && !parseAndSkipEL()) {
+            builder.append(next());
         }
 
         if (builder.length() == 0) {
@@ -237,6 +235,22 @@ public class Parser extends AbstractParser {
         var textNode = new TextNode(builder.toString());
         addNode(textNode);
         return true;
+    }
+
+    private boolean parseAndSkipEL() {
+        int startPos = pos();
+
+        if (!isEOF() && peek() == '\r') {
+            next();
+        }
+
+        if (!isEOF() && peek() == '\n') {
+            next();
+            return true;
+        }
+
+        pos(startPos);
+        return false;
     }
 
 }
