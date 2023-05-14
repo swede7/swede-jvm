@@ -18,7 +18,7 @@ public class Interpreter {
         Object actionClassObject;
         try {
             actionClassObject = actionClass.getDeclaredConstructor().newInstance();
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
