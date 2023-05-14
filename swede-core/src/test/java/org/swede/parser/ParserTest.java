@@ -31,18 +31,18 @@ class ParserTest {
         var firstScenarioNode = scenarioNodes.get(0);
         assertEquals(List.of("pass", "automated"), firstScenarioNode.getTags());
 
-        assertEquals(" Addition", firstScenarioNode.getDescription());
-        assertEquals(" Enter \"2 + 2\"", firstScenarioNode.getSteps().get(0));
-        assertEquals(" Click on calculation button", firstScenarioNode.getSteps().get(1));
-        assertEquals(" Check that the answer is \"5\"", firstScenarioNode.getSteps().get(2));
+        assertEquals("Addition", firstScenarioNode.getDescription());
+        assertEquals("Enter \"2 + 2\"", firstScenarioNode.getSteps().get(0));
+        assertEquals("Click on calculation button", firstScenarioNode.getSteps().get(1));
+        assertEquals("Check that the answer is \"5\"", firstScenarioNode.getSteps().get(2));
 
         var secondScenarioNode = scenarioNodes.get(1);
         assertEquals(List.of("fail"), secondScenarioNode.getTags());
 
-        assertEquals(" Division by zero", secondScenarioNode.getDescription());
-        assertEquals(" Enter \"5 / 0\"", secondScenarioNode.getSteps().get(0));
-        assertEquals(" Click on calculation button", secondScenarioNode.getSteps().get(1));
-        assertEquals(" Аn exception must be thrown", secondScenarioNode.getSteps().get(2));
+        assertEquals("Division by zero", secondScenarioNode.getDescription());
+        assertEquals("Enter \"5 / 0\"", secondScenarioNode.getSteps().get(0));
+        assertEquals("Click on calculation button", secondScenarioNode.getSteps().get(1));
+        assertEquals("Аn exception must be thrown", secondScenarioNode.getSteps().get(2));
     }
 
     private static String readFromFile(String path) throws IOException {
