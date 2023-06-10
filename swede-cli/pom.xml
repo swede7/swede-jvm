@@ -13,7 +13,7 @@
     <artifactId>swede-cli</artifactId>
 
     <properties>
-        <mainClass>org.swede.cli.Main</mainClass>
+        <mainClass>org.swede.core.Main</mainClass>
     </properties>
 
 
