@@ -92,7 +92,7 @@ public class SwedeTextDocumentService implements TextDocumentService {
             String[] codeLines = code.split("\\R");
 
             Position startPosition = new Position(0, 0);
-            Position endPosition = new Position(codeLines.length - 1`, codeLines[codeLines.length - 1].length());
+            Position endPosition = new Position(codeLines.length - 1, codeLines[codeLines.length - 1].length());
             Range range = new Range(startPosition, endPosition);
 
             return List.of(new TextEdit(range, formattedCode));
