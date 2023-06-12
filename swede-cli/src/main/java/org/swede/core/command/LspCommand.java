@@ -6,9 +6,13 @@ import org.swede.core.lsp.SwedeLanguageServerLauncher;
 import java.util.concurrent.ExecutionException;
 
 import static picocli.CommandLine.Command;
+import static picocli.CommandLine.Option;
 
 @Command(name = "lsp")
 public class LspCommand implements Runnable {
+    @Option(names = {"--stdio"})
+    private boolean stdio;
+
     @Override
     public void run() {
         try {
