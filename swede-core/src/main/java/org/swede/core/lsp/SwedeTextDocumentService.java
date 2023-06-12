@@ -57,4 +57,13 @@ public class SwedeTextDocumentService implements TextDocumentService {
             return Either.forLeft(Arrays.asList(completionItem));
         });
     }
+
+    @Override
+    public CompletableFuture<CompletionItem> resolveCompletionItem(CompletionItem unresolved) {
+        return CompletableFuture.supplyAsync(() -> {
+            CompletionItem completionItem = new CompletionItem();
+            completionItem.setInsertText(unresolved.getInsertText());
+            return completionItem;
+        });
+    }
 }
