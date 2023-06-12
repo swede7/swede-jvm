@@ -36,6 +36,9 @@ public class SwedeLanguageServer implements LanguageServer, LanguageClientAware 
         if (!isDynamicCompletionRegistration()) {
             response.getCapabilities().setCompletionProvider(new CompletionOptions());
         }
+
+        response.getCapabilities().setDocumentFormattingProvider(new DocumentFormattingOptions());
+
         return CompletableFuture.supplyAsync(() -> response);
     }
 

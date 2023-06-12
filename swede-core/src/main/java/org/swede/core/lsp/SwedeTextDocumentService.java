@@ -3,7 +3,14 @@ package org.swede.core.lsp;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
+import org.swede.core.formatter.Formatter;
 
+import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -64,6 +71,31 @@ public class SwedeTextDocumentService implements TextDocumentService {
             CompletionItem completionItem = new CompletionItem();
             completionItem.setInsertText(unresolved.getInsertText());
             return completionItem;
+        });
+    }
+
+    @Override
+    public CompletableFuture<List<? extends TextEdit>> formatting(DocumentFormattingParams params) {
+        return CompletableFuture.supplyAsync(() -> {
+            String code;
+
+            try {
+                URI uri = new URI(params.getTextDocument().getUri());
+                code = Files.readString(Paths.get(uri), StandardCharsets.UTF_8);
+            } catch (IOException | URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+
+            Formatter formatter = new Formatter(code);
+            String formattedCode = formatter.format();
+
+            String[] codeLines = code.split("\\R");
+
+            Position startPosition = new Position(0, 0);
+            Position endPosition = new Position(codeLines.length - 1`, codeLines[codeLines.length - 1].length());
+            Range range = new Range(startPosition, endPosition);
+
+            return List.of(new TextEdit(range, formattedCode));
         });
     }
 }
