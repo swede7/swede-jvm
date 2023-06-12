@@ -37,6 +37,10 @@ public class SwedeLanguageServer implements LanguageServer, LanguageClientAware 
             response.getCapabilities().setCompletionProvider(new CompletionOptions());
         }
 
+        if (!isDynamicSemanticTokensRegistration()) {
+            response.getCapabilities().setSemanticTokensProvider(new SemanticTokensWithRegistrationOptions());
+        }
+
         response.getCapabilities().setDocumentFormattingProvider(new DocumentFormattingOptions());
 
         return CompletableFuture.supplyAsync(() -> response);
@@ -50,6 +54,19 @@ public class SwedeLanguageServer implements LanguageServer, LanguageClientAware 
             Registration completionRegistration = new Registration(UUID.randomUUID().toString(),
                     "textDocument/completion", completionRegistrationOptions);
             languageClient.registerCapability(new RegistrationParams(List.of(completionRegistration)));
+        }
+
+        if (!isDynamicSemanticTokensRegistration()) {
+            SemanticTokensWithRegistrationOptions semanticTokensWithRegistrationOptions = new SemanticTokensWithRegistrationOptions();
+            semanticTokensWithRegistrationOptions.setFull(true);
+
+            var legend = new SemanticTokensLegend();
+            legend.setTokenTypes(List.of(SemanticTokenTypes.String));
+            semanticTokensWithRegistrationOptions.setLegend(legend);
+
+            Registration semanticTokensWithRegistration = new Registration(UUID.randomUUID().toString(),
+                    "textDocument/semanticTokens", semanticTokensWithRegistrationOptions);
+            languageClient.registerCapability(new RegistrationParams(List.of(semanticTokensWithRegistration)));
         }
     }
 
@@ -85,5 +102,12 @@ public class SwedeLanguageServer implements LanguageServer, LanguageClientAware 
                 clientCapabilities.getTextDocument();
         return textDocumentCapabilities != null && textDocumentCapabilities.getCompletion() != null
                 && Boolean.FALSE.equals(textDocumentCapabilities.getCompletion().getDynamicRegistration());
+    }
+
+    private boolean isDynamicSemanticTokensRegistration() {
+        TextDocumentClientCapabilities textDocumentCapabilities =
+                clientCapabilities.getTextDocument();
+        return textDocumentCapabilities != null && textDocumentCapabilities.getSemanticTokens() != null
+                && Boolean.FALSE.equals(textDocumentCapabilities.getSemanticTokens().getDynamicRegistration());
     }
 }
