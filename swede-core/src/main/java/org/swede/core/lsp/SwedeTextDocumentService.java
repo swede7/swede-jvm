@@ -4,6 +4,8 @@ import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
 import org.swede.core.formatter.Formatter;
+import org.swede.core.highlighter.Highlighter;
+import org.swede.core.highlighter.Token;
 
 import java.io.IOException;
 import java.net.URI;
@@ -95,7 +97,11 @@ public class SwedeTextDocumentService implements TextDocumentService {
     @Override
     public CompletableFuture<SemanticTokens> semanticTokensFull(SemanticTokensParams params) {
         return CompletableFuture.supplyAsync(() -> {
-            SemanticTokens tokens = new SemanticTokens();
+            String code = readFileByURI(params.getTextDocument().getUri());
+
+            Highlighter highlighter = new Highlighter(code);
+            List<Token> tokens = highlighter.highlight();
+
             tokens.setData(List.of(0, 0, 20, 0, 0));
             return tokens;
         });

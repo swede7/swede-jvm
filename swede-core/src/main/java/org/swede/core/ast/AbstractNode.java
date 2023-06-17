@@ -3,6 +3,7 @@ package org.swede.core.ast;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.swede.core.common.Position;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,6 +17,8 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public abstract class AbstractNode {
     private List<AbstractNode> children = new ArrayList<>();
+    private Position startPosition;
+    private Position endPosition;
 
     public <T extends AbstractNode> List<T> getChildrenByClass(Class<T> classSelector) {
         //noinspection unchecked
