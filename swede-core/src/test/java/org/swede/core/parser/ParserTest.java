@@ -20,11 +20,11 @@ class ParserTest {
         Parser parser = new Parser(code);
         var documentNode = parser.parse();
 
-        assertEquals(" Basic calculator operations", documentNode.getDescription());
+        assertEquals("   Basic calculator operations", documentNode.getDescription());
         assertEquals(List.of("all", "skip"), documentNode.getTags());
 
         var commentNode = documentNode.getChildByClass(CommentNode.class).get();
-        assertEquals(" This feature defines a set of operations that the calculator must support.", commentNode.getComment());
+        assertEquals("    This feature defines a set of operations that the calculator must support.", commentNode.getComment());
 
         var scenarioNodes = documentNode.getChildrenByClass(ScenarioNode.class);
 

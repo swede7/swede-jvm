@@ -1,6 +1,7 @@
 package org.swede.core.parser;
 
 import org.swede.core.ast.AbstractNode;
+import org.swede.core.common.Position;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,21 +11,28 @@ public abstract class AbstractParser {
 
 
     private final String code;
-    private int pos;
+    private int textCharIndex;
+    private int lineCharIndex;
+    private int line;
+
 
     private final List<AbstractNode> nodes = new ArrayList<>();
 
     public AbstractParser(String code) {
         this.code = code;
-        this.pos = 0;
+        this.textCharIndex = 0;
+        this.lineCharIndex = 0;
+        this.line = 0;
     }
 
-    public int pos() {
-        return pos;
+    public Position getPosition() {
+        return new Position(textCharIndex, lineCharIndex, line);
     }
 
-    public void pos(int newPos) {
-        this.pos = newPos;
+    public void setPosition(Position position) {
+        this.textCharIndex = position.textCharIndex();
+        this.lineCharIndex = position.lineCharIndex();
+        this.line = position.line();
     }
 
     protected void addNode(AbstractNode node) {
@@ -49,51 +57,55 @@ public abstract class AbstractParser {
     }
 
     protected boolean isEOF() {
-        return pos >= code.length();
+        return textCharIndex >= code.length();
     }
 
     protected char peek() {
-        return code.charAt(pos);
+        return code.charAt(textCharIndex);
     }
 
     protected char next() {
         char currChar = peek();
-        pos++;
+        if (currChar == '\n') {
+            line++;
+            lineCharIndex = -1;
+        }
+        lineCharIndex++;
+        textCharIndex++;
         return currChar;
     }
 
     protected boolean parseMany(Supplier<Boolean> supplier) {
-        int startPos = pos;
-        int lastCorrectPos = pos;
+        Position startPos = getPosition();
+        Position lastCorrectPos = getPosition();
 
         while (!isEOF() && supplier.get()) {
-            lastCorrectPos = pos;
+            lastCorrectPos = getPosition();
         }
 
-        if (pos == startPos) {
+        if (getPosition() == startPos) {
             return false;
         }
 
-        pos = lastCorrectPos;
+        setPosition(lastCorrectPos);
         return true;
     }
 
     protected boolean parseAndSkipChar(char c) {
-        int startPos = pos;
+        Position startPos = getPosition();
         if (next() != c) {
             //rollback
-            pos = startPos;
+            setPosition(startPos);
             return false;
         }
         return true;
     }
 
     protected boolean parseAndSkipString(String s) {
-        int startPos = pos();
+        Position startPos = getPosition();
 
         int i = 0;
-        while (!isEOF() && i < s.length() && s.charAt(i) == peek()) {
-            pos++;
+        while (!isEOF() && i < s.length() && s.charAt(i) == next()) {
             i++;
         }
 
@@ -101,7 +113,7 @@ public abstract class AbstractParser {
             return true;
         }
         // else rollback
-        pos(startPos);
+        setPosition(startPos);
         return false;
     }
 

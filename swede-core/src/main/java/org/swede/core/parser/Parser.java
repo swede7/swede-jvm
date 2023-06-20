@@ -2,6 +2,7 @@ package org.swede.core.parser;
 
 
 import org.swede.core.ast.*;
+import org.swede.core.common.Position;
 
 public class Parser extends AbstractParser {
 
@@ -26,7 +27,7 @@ public class Parser extends AbstractParser {
     }
 
     private boolean parseDocument() {
-        int startPos = pos();
+        Position startPos = getPosition();
         int startNodesCount = getNodes().size();
         DocumentNode documentNode = new DocumentNode();
 
@@ -57,18 +58,18 @@ public class Parser extends AbstractParser {
         }
 
         // rollback
-        pos(startPos);
+        setPosition(startPos);
         return false;
 
     }
 
     // _ -> (CommentNode | ScenarioNode)*
     private boolean parseExpression() {
-        int startPos = pos();
+        Position startPos = getPosition();
 
         if (isEOF() || !parseMany(() -> parseComment() || parseScenario() || parseAndSkipWS())) {
             // else rollback
-            pos(startPos);
+            setPosition(startPos);
             return false;
         }
 
@@ -76,23 +77,23 @@ public class Parser extends AbstractParser {
     }
 
     private boolean parseAndSkipWS() {
-        int startPos = pos();
+        Position startPos = getPosition();
 
         if (!isEOF() && parseMany(() -> parseAndSkipChar(' ') || parseAndSkipEL())) {
             return true;
         }
         // else rollback
-        pos(startPos);
+        setPosition(startPos);
         return false;
     }
 
     // _ -> TagNode+
     private boolean parseTags() {
-        int startPos = pos();
+        Position startPos = getPosition();
 
         if (!parseTag()) {
             // else rollback
-            pos(startPos);
+            setPosition(startPos);
             return false;
         }
 
@@ -102,17 +103,17 @@ public class Parser extends AbstractParser {
             return true;
         }
         //rollback
-        pos(startPos);
+        setPosition(startPos);
         return false;
     }
 
     // _ -> TagNode
     private boolean parseTag() {
-        int startPos = pos();
+        Position startPos = getPosition();
 
         if (isEOF() || !parseAndSkipChar(TAG_CHAR)) {
             //rollback
-            pos(startPos);
+            setPosition(startPos);
             return false;
         }
 
@@ -124,18 +125,20 @@ public class Parser extends AbstractParser {
 
         if (builder.length() == 0) {
             //rollback
-            pos(startPos);
+            setPosition(startPos);
             return false;
         }
 
         var tagNode = new TagNode(builder.toString());
+        tagNode.setStartPosition(startPos);
+        tagNode.setEndPosition(getPosition());
         addNode(tagNode);
         return true;
     }
 
     // (TagNode+)? TextNode StepNode* -> ScenarioNode
     private boolean parseScenario() {
-        int startPos = pos();
+        Position startPos = getPosition();
         int startNodesCount = getNodes().size();
 
         var scenarioNode = new ScenarioNode();
@@ -174,7 +177,7 @@ public class Parser extends AbstractParser {
         }
 
         // else revert
-        pos(startPos);
+        setPosition(startPos);
 
         while (startNodesCount != getNodes().size()) {
             removeNode(getNodes().size() - 1);
@@ -186,11 +189,11 @@ public class Parser extends AbstractParser {
 
     // TextNode -> StepNode
     private boolean parseStep() {
-        int startPos = pos();
+        Position startPos = getPosition();
 
         if (!parseAndSkipChar('-') || !parseText()) {
             //rollback
-            pos(startPos);
+            setPosition(startPos);
             return false;
         }
 
@@ -205,11 +208,11 @@ public class Parser extends AbstractParser {
 
     // TextNode -> CommentNode
     private boolean parseComment() {
-        int startPos = pos();
+        Position startPos = getPosition();
 
         if (!parseAndSkipChar('#') || !parseText()) {
             //rollback
-            pos(startPos);
+            setPosition(startPos);
             return false;
         }
 
@@ -239,7 +242,7 @@ public class Parser extends AbstractParser {
     }
 
     private boolean parseAndSkipEL() {
-        int startPos = pos();
+        Position startPos = getPosition();
 
         if (!isEOF() && peek() == '\r') {
             next();
@@ -250,7 +253,7 @@ public class Parser extends AbstractParser {
             return true;
         }
 
-        pos(startPos);
+        setPosition(startPos);
         return false;
     }
 

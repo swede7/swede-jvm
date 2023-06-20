@@ -1,9 +1,5 @@
 package org.swede.core.common;
 
-import lombok.Data;
+public record Position(int textCharIndex, int lineCharIndex, int line) {
 
-@Data
-public class Position {
-    int lineNumber;
-    int charNumber;
 }

@@ -6,6 +6,7 @@ import org.eclipse.lsp4j.services.TextDocumentService;
 import org.swede.core.formatter.Formatter;
 import org.swede.core.highlighter.Highlighter;
 import org.swede.core.highlighter.Token;
+import org.swede.core.lsp.mapper.TokenMapper;
 
 import java.io.IOException;
 import java.net.URI;
@@ -32,26 +33,22 @@ public class SwedeTextDocumentService implements TextDocumentService {
 
     @Override
     public void didOpen(DidOpenTextDocumentParams didOpenTextDocumentParams) {
-        this.clientLogger.logMessage("Operation '" + "text/didOpen" +
-                "' {fileUri: '" + didOpenTextDocumentParams.getTextDocument().getUri() + "'} opened");
+        this.clientLogger.logMessage("Operation '" + "text/didOpen" + "' {fileUri: '" + didOpenTextDocumentParams.getTextDocument().getUri() + "'} opened");
     }
 
     @Override
     public void didChange(DidChangeTextDocumentParams didChangeTextDocumentParams) {
-        this.clientLogger.logMessage("Operation '" + "text/didChange" +
-                "' {fileUri: '" + didChangeTextDocumentParams.getTextDocument().getUri() + "'} Changed");
+        this.clientLogger.logMessage("Operation '" + "text/didChange" + "' {fileUri: '" + didChangeTextDocumentParams.getTextDocument().getUri() + "'} Changed");
     }
 
     @Override
     public void didClose(DidCloseTextDocumentParams didCloseTextDocumentParams) {
-        this.clientLogger.logMessage("Operation '" + "text/didClose" +
-                "' {fileUri: '" + didCloseTextDocumentParams.getTextDocument().getUri() + "'} Closed");
+        this.clientLogger.logMessage("Operation '" + "text/didClose" + "' {fileUri: '" + didCloseTextDocumentParams.getTextDocument().getUri() + "'} Closed");
     }
 
     @Override
     public void didSave(DidSaveTextDocumentParams didSaveTextDocumentParams) {
-        this.clientLogger.logMessage("Operation '" + "text/didSave" +
-                "' {fileUri: '" + didSaveTextDocumentParams.getTextDocument().getUri() + "'} Saved");
+        this.clientLogger.logMessage("Operation '" + "text/didSave" + "' {fileUri: '" + didSaveTextDocumentParams.getTextDocument().getUri() + "'} Saved");
     }
 
     @Override
@@ -97,13 +94,13 @@ public class SwedeTextDocumentService implements TextDocumentService {
     @Override
     public CompletableFuture<SemanticTokens> semanticTokensFull(SemanticTokensParams params) {
         return CompletableFuture.supplyAsync(() -> {
+
             String code = readFileByURI(params.getTextDocument().getUri());
 
             Highlighter highlighter = new Highlighter(code);
             List<Token> tokens = highlighter.highlight();
-
-            tokens.setData(List.of(0, 0, 20, 0, 0));
-            return tokens;
+            SemanticTokens semanticTokens = TokenMapper.mapTokens(tokens);
+            return semanticTokens;
         });
     }
 

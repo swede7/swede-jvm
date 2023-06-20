@@ -9,6 +9,7 @@ import org.swede.core.common.Position;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Token {
-    Position position;
-    TokenType type;
+    private Position startPosition;
+    private Position endPosition;
+    private TokenType type;
 }

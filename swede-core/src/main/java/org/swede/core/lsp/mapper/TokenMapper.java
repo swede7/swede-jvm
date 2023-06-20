@@ -13,24 +13,44 @@ public class TokenMapper {
         SemanticTokens semanticTokens = new SemanticTokens();
         List<Integer> data = new ArrayList<>();
 
-        for (Token token : tokens) {
-            int deltaLine = 0;
-            int deltaStart = 0;
-            int length;
-            int tokenType = mapTokenType(token.getType());
-            int tokenModifiers = 0;
+        Token prevToken = null;
 
+        for (Token token : tokens) {
+            var startPosition = token.getStartPosition();
+            var endPosition = token.getEndPosition();
+
+            int deltaLine = prevToken == null ? startPosition.line() : startPosition.line() - prevToken.getStartPosition().line();
             data.add(deltaLine);
+
+            int deltaStart;
+            if (deltaLine == 0) {
+                deltaStart = prevToken == null ? startPosition.lineCharIndex() : startPosition.lineCharIndex() - prevToken.getStartPosition().lineCharIndex();
+            } else {
+                deltaStart = startPosition.lineCharIndex();
+            }
             data.add(deltaStart);
+
+
+            int length = endPosition.textCharIndex() - startPosition.textCharIndex();
             data.add(length);
+
+            int tokenType = mapTokenType(token.getType());
             data.add(tokenType);
+
+            // todo
+            int tokenModifiers = 0;
             data.add(tokenModifiers);
+
+            prevToken = token;
         }
+
+        semanticTokens.setData(data);
+        return semanticTokens;
     }
 
     public static Integer mapTokenType(TokenType type) {
         return switch (type) {
-            case TAG -> 1;
+            case TAG -> 0;
         };
     }
 

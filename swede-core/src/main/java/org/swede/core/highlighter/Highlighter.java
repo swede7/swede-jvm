@@ -12,6 +12,7 @@ import java.util.List;
 public class Highlighter {
     private final String code;
 
+
     public Highlighter(String code) {
         this.code = code;
     }
@@ -23,13 +24,13 @@ public class Highlighter {
 
         List<Token> tokens = new ArrayList<>();
         Utils.visitTree(documentNode, node -> processNode(node, tokens));
-
         return tokens;
     }
 
     private void processNode(AbstractNode node, List<Token> tokens) {
         Token token = new Token();
-        token.setPosition(node.getPosition());
+        token.setStartPosition(node.getStartPosition());
+        token.setEndPosition(node.getEndPosition());
 
         if (node instanceof TagNode) {
             token.setType(TokenType.TAG);
