@@ -33,11 +33,16 @@ public class SwedeTextDocumentService implements TextDocumentService {
 
     @Override
     public void didOpen(DidOpenTextDocumentParams didOpenTextDocumentParams) {
+        var code = didOpenTextDocumentParams.getTextDocument().getText();
+        CodeHolder.setCode(code);
         this.clientLogger.logMessage("Operation '" + "text/didOpen" + "' {fileUri: '" + didOpenTextDocumentParams.getTextDocument().getUri() + "'} opened");
     }
 
     @Override
     public void didChange(DidChangeTextDocumentParams didChangeTextDocumentParams) {
+        var textDocumentContentChangeEvent = didChangeTextDocumentParams.getContentChanges().get(0);
+        var newCode = textDocumentContentChangeEvent.getText();
+        CodeHolder.setCode(newCode);
         this.clientLogger.logMessage("Operation '" + "text/didChange" + "' {fileUri: '" + didChangeTextDocumentParams.getTextDocument().getUri() + "'} Changed");
     }
 
@@ -76,7 +81,7 @@ public class SwedeTextDocumentService implements TextDocumentService {
     @Override
     public CompletableFuture<List<? extends TextEdit>> formatting(DocumentFormattingParams params) {
         return CompletableFuture.supplyAsync(() -> {
-            String code = readFileByURI(params.getTextDocument().getUri());
+            String code = CodeHolder.getCode();
 
             Formatter formatter = new Formatter(code);
             String formattedCode = formatter.format();
@@ -95,7 +100,7 @@ public class SwedeTextDocumentService implements TextDocumentService {
     public CompletableFuture<SemanticTokens> semanticTokensFull(SemanticTokensParams params) {
         return CompletableFuture.supplyAsync(() -> {
 
-            String code = readFileByURI(params.getTextDocument().getUri());
+            String code = CodeHolder.getCode();
 
             Highlighter highlighter = new Highlighter(code);
             List<Token> tokens = highlighter.highlight();
@@ -104,15 +109,15 @@ public class SwedeTextDocumentService implements TextDocumentService {
         });
     }
 
-    private static String readFileByURI(String uriAsString) {
-        String code;
-
-        try {
-            URI uri = new URI(uriAsString);
-            code = Files.readString(Paths.get(uri), StandardCharsets.UTF_8);
-        } catch (IOException | URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-        return code;
-    }
+//    private static String readFileByURI(String uriAsString) {
+//        String code;
+//
+//        try {
+//            URI uri = new URI(uriAsString);
+//            code = Files.readString(Paths.get(uri), StandardCharsets.UTF_8);
+//        } catch (IOException | URISyntaxException e) {
+//            throw new RuntimeException(e);
+//        }
+//        return code;
+//    }
 }
