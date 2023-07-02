@@ -56,12 +56,12 @@ public class SwedeLanguageServer implements LanguageServer, LanguageClientAware 
             languageClient.registerCapability(new RegistrationParams(List.of(completionRegistration)));
         }
 
-        if (!isDynamicSemanticTokensRegistration()) {
+        if (isDynamicSemanticTokensRegistration()) {
             SemanticTokensWithRegistrationOptions semanticTokensWithRegistrationOptions = new SemanticTokensWithRegistrationOptions();
             semanticTokensWithRegistrationOptions.setFull(true);
 
             var legend = new SemanticTokensLegend();
-            legend.setTokenTypes(List.of(SemanticTokenTypes.String));
+            legend.setTokenTypes(List.of(SemanticTokenTypes.Modifier, SemanticTokenTypes.Comment));
             semanticTokensWithRegistrationOptions.setLegend(legend);
 
             Registration semanticTokensWithRegistration = new Registration(UUID.randomUUID().toString(),
@@ -101,13 +101,13 @@ public class SwedeLanguageServer implements LanguageServer, LanguageClientAware 
         TextDocumentClientCapabilities textDocumentCapabilities =
                 clientCapabilities.getTextDocument();
         return textDocumentCapabilities != null && textDocumentCapabilities.getCompletion() != null
-                && Boolean.FALSE.equals(textDocumentCapabilities.getCompletion().getDynamicRegistration());
+                && Boolean.TRUE.equals(textDocumentCapabilities.getCompletion().getDynamicRegistration());
     }
 
     private boolean isDynamicSemanticTokensRegistration() {
         TextDocumentClientCapabilities textDocumentCapabilities =
                 clientCapabilities.getTextDocument();
         return textDocumentCapabilities != null && textDocumentCapabilities.getSemanticTokens() != null
-                && Boolean.FALSE.equals(textDocumentCapabilities.getSemanticTokens().getDynamicRegistration());
+                && Boolean.TRUE.equals(textDocumentCapabilities.getSemanticTokens().getDynamicRegistration());
     }
 }

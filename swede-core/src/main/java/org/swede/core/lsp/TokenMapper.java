@@ -1,4 +1,4 @@
-package org.swede.core.lsp.mapper;
+package org.swede.core.lsp;
 
 import org.eclipse.lsp4j.SemanticTokens;
 import org.swede.core.highlighter.Token;
@@ -51,6 +51,7 @@ public class TokenMapper {
     public static Integer mapTokenType(TokenType type) {
         return switch (type) {
             case TAG -> 0;
+            case COMMENT -> 1;
         };
     }
 

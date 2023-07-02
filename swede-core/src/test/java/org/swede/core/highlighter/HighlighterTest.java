@@ -3,7 +3,7 @@ package org.swede.core.highlighter;
 import com.sun.tools.javac.Main;
 import org.eclipse.lsp4j.SemanticTokens;
 import org.junit.jupiter.api.Test;
-import org.swede.core.lsp.mapper.TokenMapper;
+import org.swede.core.lsp.TokenMapper;
 
 import java.io.IOException;
 import java.io.InputStream;

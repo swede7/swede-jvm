@@ -1,9 +1,6 @@
 package org.swede.core.highlighter;
 
-import org.swede.core.ast.AbstractNode;
-import org.swede.core.ast.DocumentNode;
-import org.swede.core.ast.TagNode;
-import org.swede.core.ast.Utils;
+import org.swede.core.ast.*;
 import org.swede.core.parser.Parser;
 
 import java.util.ArrayList;
@@ -34,6 +31,10 @@ public class Highlighter {
 
         if (node instanceof TagNode) {
             token.setType(TokenType.TAG);
+            tokens.add(token);
+        }
+        if(node instanceof CommentNode){
+            token.setType(TokenType.COMMENT);
             tokens.add(token);
         }
     }

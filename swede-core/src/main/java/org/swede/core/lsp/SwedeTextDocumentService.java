@@ -6,14 +6,7 @@ import org.eclipse.lsp4j.services.TextDocumentService;
 import org.swede.core.formatter.Formatter;
 import org.swede.core.highlighter.Highlighter;
 import org.swede.core.highlighter.Token;
-import org.swede.core.lsp.mapper.TokenMapper;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
