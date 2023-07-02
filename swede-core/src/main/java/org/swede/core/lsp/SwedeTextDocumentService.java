@@ -75,42 +75,39 @@ public class SwedeTextDocumentService implements TextDocumentService {
     public CompletableFuture<List<? extends TextEdit>> formatting(DocumentFormattingParams params) {
         return CompletableFuture.supplyAsync(() -> {
             String code = CodeHolder.getCode();
+            try {
+                Formatter formatter = new Formatter(code);
+                String formattedCode = formatter.format();
 
-            Formatter formatter = new Formatter(code);
-            String formattedCode = formatter.format();
+                String[] codeLines = code.split("\\R");
 
-            String[] codeLines = code.split("\\R");
+                Position startPosition = new Position(0, 0);
+                Position endPosition = new Position(codeLines.length - 1, codeLines[codeLines.length - 1].length());
+                Range range = new Range(startPosition, endPosition);
 
-            Position startPosition = new Position(0, 0);
-            Position endPosition = new Position(codeLines.length - 1, codeLines[codeLines.length - 1].length());
-            Range range = new Range(startPosition, endPosition);
-
-            return List.of(new TextEdit(range, formattedCode));
+                return List.of(new TextEdit(range, formattedCode));
+            } catch (Exception e) {
+                return List.of();
+            }
         });
     }
 
     @Override
     public CompletableFuture<SemanticTokens> semanticTokensFull(SemanticTokensParams params) {
         return CompletableFuture.supplyAsync(() -> {
-
-            String code = CodeHolder.getCode();
-
-            Highlighter highlighter = new Highlighter(code);
-            List<Token> tokens = highlighter.highlight();
-            SemanticTokens semanticTokens = TokenMapper.mapTokens(tokens);
-            return semanticTokens;
+            try {
+                clientLogger.logMessage("---start");
+                String code = CodeHolder.getCode();
+                Highlighter highlighter = new Highlighter(code);
+                List<Token> tokens = highlighter.highlight();
+                clientLogger.logMessage(tokens.toString());
+                clientLogger.logMessage("---end");
+                return TokenMapper.mapTokens(tokens);
+            } catch (Exception e) {
+                clientLogger.logMessage("---catch");
+                clientLogger.logMessage(Arrays.toString(e.getStackTrace()));
+                return new SemanticTokens(List.of());
+            }
         });
     }
-
-//    private static String readFileByURI(String uriAsString) {
-//        String code;
-//
-//        try {
-//            URI uri = new URI(uriAsString);
-//            code = Files.readString(Paths.get(uri), StandardCharsets.UTF_8);
-//        } catch (IOException | URISyntaxException e) {
-//            throw new RuntimeException(e);
-//        }
-//        return code;
-//    }
 }

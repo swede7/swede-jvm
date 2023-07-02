@@ -83,7 +83,7 @@ public abstract class AbstractParser {
             lastCorrectPos = getPosition();
         }
 
-        if (getPosition() == startPos) {
+        if (getPosition().equals(startPos)) {
             return false;
         }
 

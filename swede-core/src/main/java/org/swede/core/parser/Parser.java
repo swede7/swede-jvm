@@ -72,19 +72,18 @@ public class Parser extends AbstractParser {
             setPosition(startPos);
             return false;
         }
-
         return true;
     }
 
     private boolean parseAndSkipWS() {
         Position startPos = getPosition();
 
-        if (!isEOF() && parseMany(() -> parseAndSkipChar(' ') || parseAndSkipEL())) {
-            return true;
+        if (isEOF() || !parseMany(() -> parseAndSkipChar(' ') || parseAndSkipEL())) {
+            // else rollback
+            setPosition(startPos);
+            return false;
         }
-        // else rollback
-        setPosition(startPos);
-        return false;
+        return true;
     }
 
     // _ -> TagNode+
@@ -220,6 +219,8 @@ public class Parser extends AbstractParser {
         removeNode(getNodes().size() - 1);
 
         var commentNode = new CommentNode(textNode.getText());
+        commentNode.setStartPosition(startPos);
+        commentNode.setEndPosition(getPosition());
         addNode(commentNode);
         return true;
     }
