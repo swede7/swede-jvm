@@ -1,8 +1,11 @@
 package org.swede.core.lsp;
 
-public class CodeHolder {
+public final class CodeHolder {
 
-    static String code;
+    private CodeHolder() {
+    }
+
+    private static String code;
 
     public static String getCode() {
         return code;

@@ -7,9 +7,9 @@ import org.eclipse.lsp4j.services.LanguageClient;
 /**
  * Use this class to send log messages to the client.
  */
-public class LSClientLogger {
+public final class LSClientLogger {
 
-    private static LSClientLogger INSTANCE;
+    private static LSClientLogger instance;
     private LanguageClient client;
     private boolean isInitialized;
 
@@ -24,10 +24,10 @@ public class LSClientLogger {
     }
 
     public static LSClientLogger getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new LSClientLogger();
+        if (instance == null) {
+            instance = new LSClientLogger();
         }
-        return INSTANCE;
+        return instance;
     }
 
     public void logMessage(String message) {

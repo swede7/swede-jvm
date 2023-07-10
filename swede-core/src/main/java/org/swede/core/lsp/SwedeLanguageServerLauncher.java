@@ -11,7 +11,10 @@ import java.util.concurrent.Future;
 /**
  * Standard IO Launcher for Swede Language Server.
  */
-public class SwedeLanguageServerLauncher {
+public final class SwedeLanguageServerLauncher {
+
+    private SwedeLanguageServerLauncher() {
+    }
 
     /**
      * Starts the language server given the input and output streams to read and write messages.

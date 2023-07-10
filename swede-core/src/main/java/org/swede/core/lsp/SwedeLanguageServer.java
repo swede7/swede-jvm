@@ -12,10 +12,10 @@ import java.util.concurrent.CompletableFuture;
  */
 public class SwedeLanguageServer implements LanguageServer, LanguageClientAware {
 
-    private TextDocumentService textDocumentService;
-    private WorkspaceService workspaceService;
+    private final TextDocumentService textDocumentService;
+    private final WorkspaceService workspaceService;
     private ClientCapabilities clientCapabilities;
-    LanguageClient languageClient;
+    private LanguageClient languageClient;
     private int shutdown = 1;
 
     public SwedeLanguageServer() {
@@ -26,13 +26,10 @@ public class SwedeLanguageServer implements LanguageServer, LanguageClientAware 
     @Override
     public CompletableFuture<InitializeResult> initialize(InitializeParams initializeParams) {
         final InitializeResult response = new InitializeResult(new ServerCapabilities());
-        //Set the document synchronization capabilities to full. 
+
         response.getCapabilities().setTextDocumentSync(TextDocumentSyncKind.Full);
         this.clientCapabilities = initializeParams.getCapabilities();
-        
-        /* Check if dynamic registration of completion capability is allowed by the client. If so we don't register the capability.
-           Else, we register the completion capability.  
-         */
+
         if (!isDynamicCompletionRegistration()) {
             response.getCapabilities().setCompletionProvider(new CompletionOptions());
         }
@@ -92,8 +89,8 @@ public class SwedeLanguageServer implements LanguageServer, LanguageClientAware 
     }
 
     @Override
-    public void connect(LanguageClient languageClient) {
-        this.languageClient = languageClient;
+    public void connect(LanguageClient client) {
+        this.languageClient = client;
         LSClientLogger.getInstance().initialize(this.languageClient);
     }
 

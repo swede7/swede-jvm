@@ -6,7 +6,7 @@ import org.swede.core.parser.Parser;
 import java.util.List;
 
 public class Formatter {
-    public static final String END_OF_LINE = "\n";
+    private static final String END_OF_LINE = "\n";
     private final String code;
 
 

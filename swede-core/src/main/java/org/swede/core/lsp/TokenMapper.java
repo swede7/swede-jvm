@@ -7,7 +7,11 @@ import org.swede.core.highlighter.TokenType;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TokenMapper {
+public final class TokenMapper {
+
+    private TokenMapper() {
+    }
+
     public static SemanticTokens mapTokens(List<Token> tokens) {
 
         SemanticTokens semanticTokens = new SemanticTokens();

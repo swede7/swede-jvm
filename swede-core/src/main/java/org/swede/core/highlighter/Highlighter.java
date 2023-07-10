@@ -33,7 +33,7 @@ public class Highlighter {
             token.setType(TokenType.TAG);
             tokens.add(token);
         }
-        if(node instanceof CommentNode){
+        if (node instanceof CommentNode) {
             token.setType(TokenType.COMMENT);
             tokens.add(token);
         }
