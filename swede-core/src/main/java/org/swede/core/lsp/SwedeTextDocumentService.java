@@ -96,16 +96,11 @@ public class SwedeTextDocumentService implements TextDocumentService {
     public CompletableFuture<SemanticTokens> semanticTokensFull(SemanticTokensParams params) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                clientLogger.logMessage("---start");
                 String code = CodeHolder.getCode();
                 Highlighter highlighter = new Highlighter(code);
                 List<Token> tokens = highlighter.highlight();
-                clientLogger.logMessage(tokens.toString());
-                clientLogger.logMessage("---end");
                 return TokenMapper.mapTokens(tokens);
             } catch (Exception e) {
-                clientLogger.logMessage("---catch");
-                clientLogger.logMessage(Arrays.toString(e.getStackTrace()));
                 return new SemanticTokens(List.of());
             }
         });
