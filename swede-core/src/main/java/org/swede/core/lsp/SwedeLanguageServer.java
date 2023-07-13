@@ -35,7 +35,14 @@ public class SwedeLanguageServer implements LanguageServer, LanguageClientAware 
         }
 
         if (!isDynamicSemanticTokensRegistration()) {
-            response.getCapabilities().setSemanticTokensProvider(new SemanticTokensWithRegistrationOptions());
+            SemanticTokensWithRegistrationOptions semanticTokensWithRegistrationOptions = new SemanticTokensWithRegistrationOptions();
+            semanticTokensWithRegistrationOptions.setFull(true);
+
+            var legend = new SemanticTokensLegend();
+            legend.setTokenTypes(List.of(SemanticTokenTypes.Modifier, SemanticTokenTypes.Comment));
+            semanticTokensWithRegistrationOptions.setLegend(legend);
+
+            response.getCapabilities().setSemanticTokensProvider(semanticTokensWithRegistrationOptions);
         }
 
         response.getCapabilities().setDocumentFormattingProvider(new DocumentFormattingOptions());
