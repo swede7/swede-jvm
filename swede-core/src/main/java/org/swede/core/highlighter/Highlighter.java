@@ -37,5 +37,9 @@ public class Highlighter {
             token.setType(TokenType.COMMENT);
             tokens.add(token);
         }
+        if (node instanceof StepNode) {
+            token.setType(TokenType.STEP);
+            tokens.add(token);
+        }
     }
 }

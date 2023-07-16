@@ -56,6 +56,7 @@ public final class TokenMapper {
         return switch (type) {
             case TAG -> 0;
             case COMMENT -> 1;
+            case STEP -> 2;
         };
     }
 

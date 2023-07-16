@@ -200,6 +200,8 @@ public class Parser extends AbstractParser {
         removeNode(getNodes().size() - 1);
 
         var stepNode = new StepNode(textNode.getText());
+        stepNode.setStartPosition(startPos);
+        stepNode.setEndPosition(getPosition());
         addNode(stepNode);
         return true;
     }
