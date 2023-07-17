@@ -1,7 +1,7 @@
 package org.swede.core.command;
 
 
-import org.swede.core.lsp.SwedeLanguageServerLauncher;
+import org.swede.lsp.SwedeLanguageServerLauncher;
 
 import java.util.concurrent.ExecutionException;
 

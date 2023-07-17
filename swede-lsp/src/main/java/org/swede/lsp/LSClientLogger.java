@@ -1,4 +1,4 @@
-package org.swede.core.lsp;
+package org.swede.lsp;
 
 import org.eclipse.lsp4j.MessageParams;
 import org.eclipse.lsp4j.MessageType;

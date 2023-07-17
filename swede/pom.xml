@@ -13,6 +13,7 @@
         <module>../swede-core</module>
         <module>../swede-demo-project</module>
         <module>../swede-cli</module>
+        <module>../swede-lsp</module>
     </modules>
 
     <properties>

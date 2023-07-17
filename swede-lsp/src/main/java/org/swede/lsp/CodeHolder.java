@@ -1,4 +1,4 @@
-package org.swede.core.lsp;
+package org.swede.lsp;
 
 public final class CodeHolder {
 
