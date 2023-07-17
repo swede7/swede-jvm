@@ -41,5 +41,9 @@ public class Highlighter {
             token.setType(TokenType.STEP);
             tokens.add(token);
         }
+        if (node instanceof KeywordNode) {
+            token.setType(TokenType.KEYWORD);
+            tokens.add(token);
+        }
     }
 }

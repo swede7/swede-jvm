@@ -31,7 +31,7 @@ public class Parser extends AbstractParser {
         int startNodesCount = getNodes().size();
         DocumentNode documentNode = new DocumentNode();
 
-        if (parseTags() && parseAndSkipString("Feature:") && parseText() && parseMany(this::parseExpression)) {
+        if (parseTags() && parseKeyword("Feature:") && parseText() && parseMany(this::parseExpression)) {
             int endNodesCount = getNodes().size();
             for (int i = startNodesCount; i < endNodesCount; i++) {
                 documentNode.addChild(getNode(i));
@@ -44,7 +44,7 @@ public class Parser extends AbstractParser {
             return true;
         }
 
-        if (parseAndSkipString("Feature:") && parseText() && parseMany(this::parseExpression)) {
+        if (parseKeyword("Feature:") && parseText() && parseMany(this::parseExpression)) {
             int endNodesCount = getNodes().size();
             for (int i = startNodesCount; i < endNodesCount; i++) {
                 documentNode.addChild(getNode(i));
@@ -156,13 +156,16 @@ public class Parser extends AbstractParser {
             }
         }
 
-        if (parseAndSkipString("Scenario:") && parseText() && parseMany(this::parseStep)) {
+        if (parseKeyword("Scenario:") && parseText() && parseMany(this::parseStep)) {
             int endNodesCount = getNodes().size();
 
-            var textNode = getNode(startNodesCount, TextNode.class);
+            var keywordNode = getNode(startNodesCount, KeywordNode.class);
+            scenarioNode.addChild(keywordNode);
+
+            var textNode = getNode(startNodesCount + 1, TextNode.class);
             scenarioNode.addChild(textNode);
 
-            for (int i = startNodesCount + 1; i < endNodesCount; i++) {
+            for (int i = startNodesCount + 2; i < endNodesCount; i++) {
                 var stepNode = (StepNode) getNode(i);
                 scenarioNode.addChild(stepNode);
             }
@@ -258,6 +261,21 @@ public class Parser extends AbstractParser {
 
         setPosition(startPos);
         return false;
+    }
+
+    // _ -> KeywordToken
+    private boolean parseKeyword(String text) {
+        Position startPos = getPosition();
+
+        if (!parseAndSkipString(text)) {
+            return false;
+        }
+        var keywordNode = new KeywordNode();
+        keywordNode.setStartPosition(startPos);
+        keywordNode.setEndPosition(getPosition());
+
+        addNode(keywordNode);
+        return true;
     }
 
 }

@@ -4,4 +4,5 @@ public enum TokenType {
     TAG,
     COMMENT,
     STEP,
+    KEYWORD,
 }

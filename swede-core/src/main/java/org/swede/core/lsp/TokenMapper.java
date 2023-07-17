@@ -57,6 +57,7 @@ public final class TokenMapper {
             case TAG -> 0;
             case COMMENT -> 1;
             case STEP -> 2;
+            case KEYWORD -> 3;
         };
     }
 

@@ -39,7 +39,7 @@ public class SwedeLanguageServer implements LanguageServer, LanguageClientAware 
             semanticTokensWithRegistrationOptions.setFull(true);
 
             var legend = new SemanticTokensLegend();
-            legend.setTokenTypes(List.of(SemanticTokenTypes.Modifier, SemanticTokenTypes.Comment, SemanticTokenTypes.String));
+            legend.setTokenTypes(List.of(SemanticTokenTypes.Modifier, SemanticTokenTypes.Comment, SemanticTokenTypes.String, SemanticTokenTypes.Keyword));
             semanticTokensWithRegistrationOptions.setLegend(legend);
 
             response.getCapabilities().setSemanticTokensProvider(semanticTokensWithRegistrationOptions);
@@ -65,7 +65,7 @@ public class SwedeLanguageServer implements LanguageServer, LanguageClientAware 
             semanticTokensWithRegistrationOptions.setFull(true);
 
             var legend = new SemanticTokensLegend();
-            legend.setTokenTypes(List.of(SemanticTokenTypes.Modifier, SemanticTokenTypes.Comment, SemanticTokenTypes.String));
+            legend.setTokenTypes(List.of(SemanticTokenTypes.Modifier, SemanticTokenTypes.Comment, SemanticTokenTypes.String, SemanticTokenTypes.Keyword));
             semanticTokensWithRegistrationOptions.setLegend(legend);
 
             Registration semanticTokensWithRegistration = new Registration(UUID.randomUUID().toString(),
