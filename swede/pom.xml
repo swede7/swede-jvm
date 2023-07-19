@@ -14,6 +14,7 @@
         <module>../swede-demo-project</module>
         <module>../swede-cli</module>
         <module>../swede-lsp</module>
+        <module>../swede-junit5-runner</module>
     </modules>
 
     <properties>

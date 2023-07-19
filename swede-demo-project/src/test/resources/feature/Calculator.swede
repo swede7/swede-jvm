@@ -1,0 +1,8 @@
+Feature: calculator
+
+# example comment
+
+@pass @automated
+Scenario: Test addition
+- Add 2 + 2
+- Check that returned 4

@@ -1,0 +1,8 @@
+@all  @automatic
+Feature: Example feature
+
+Scenario: print message to console
+- print hello world
+
+Scenario: implemented steps should be skipped
+- not implemented step

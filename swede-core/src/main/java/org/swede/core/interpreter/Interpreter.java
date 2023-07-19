@@ -65,28 +65,38 @@ public class Interpreter {
         };
     }
 
-    public void execute(DocumentNode node) {
+    public boolean execute(DocumentNode node) {
         var featureContext = new FeatureContext();
 
+        boolean status = true;
         for (var scenarioNode : node.getScenariosNodes()) {
-            executeScenario(scenarioNode, featureContext);
+            status = status & executeScenario(scenarioNode, featureContext);
         }
+        return status;
     }
 
-    private void executeScenario(ScenarioNode scenario, FeatureContext featureContext) {
-        System.out.println("executing scenario: " + scenario.getDescription());
+    private boolean executeScenario(ScenarioNode scenario, FeatureContext featureContext) {
+        System.out.println(">>> executing scenario: " + scenario.getDescription());
 
         var scenarioContext = new ScenarioContext();
+
+        boolean status = true;
         for (var stepNode : scenario.getSteps()) {
-            executeStep(stepNode, scenarioContext, featureContext);
+            status = status && executeStep(stepNode, scenarioContext, featureContext);
         }
+
+        return status;
     }
 
-    private void executeStep(String stepName, ScenarioContext scenarioContext, FeatureContext featureContext) {
-        System.out.println("executing step: " + stepName);
-
+    private boolean executeStep(String stepName, ScenarioContext scenarioContext, FeatureContext featureContext) {
         var action = actionMap.get(stepName);
+
+        if (action == null) {
+            System.out.println(">>> step with name: " + stepName + " not implemented. skipping...");
+            return true;
+        }
+
         var result = action.execute(featureContext, scenarioContext);
-        System.out.printf("status: %s, message: %s%n", result.getStatus(), result.getMessage());
+        return result.getStatus().equals(ActionResult.ResultStatus.OK);
     }
 }
