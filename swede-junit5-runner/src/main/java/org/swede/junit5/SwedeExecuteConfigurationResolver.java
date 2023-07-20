@@ -29,9 +29,7 @@ public final class SwedeExecuteConfigurationResolver {
             configurationOptional.ifPresent(configurations::add);
         });
 
-        request.getSelectorsByType(PackageSelector.class).forEach(packageSelector -> {
-            configurations.addAll(findExecuteConfigurationsInPackage(packageSelector.getPackageName()));
-        });
+        request.getSelectorsByType(PackageSelector.class).forEach(packageSelector -> configurations.addAll(findExecuteConfigurationsInPackage(packageSelector.getPackageName())));
 
         request.getSelectorsByType(ClasspathRootSelector.class).forEach(classpathRootSelector -> {
             configurations.addAll(findExecuteConfigurationsInClasspathRoot(classpathRootSelector.getClasspathRoot()));

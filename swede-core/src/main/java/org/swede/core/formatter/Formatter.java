@@ -9,7 +9,7 @@ public final class Formatter {
     private static final String END_OF_LINE = "\n";
 
 
-    private Formatter(String code) {
+    private Formatter() {
     }
 
     public static String format(String code) {

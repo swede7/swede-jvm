@@ -7,7 +7,6 @@ import org.swede.core.formatter.Formatter;
 import org.swede.core.highlighter.Highlighter;
 import org.swede.core.highlighter.Token;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -16,11 +15,9 @@ import java.util.concurrent.CompletableFuture;
  */
 public class SwedeTextDocumentService implements TextDocumentService {
 
-    private SwedeLanguageServer languageServer;
-    private LSClientLogger clientLogger;
+    private final LSClientLogger clientLogger;
 
-    public SwedeTextDocumentService(SwedeLanguageServer languageServer) {
-        this.languageServer = languageServer;
+    public SwedeTextDocumentService() {
         this.clientLogger = LSClientLogger.getInstance();
     }
 
@@ -58,7 +55,7 @@ public class SwedeTextDocumentService implements TextDocumentService {
             completionItem.setInsertText("Test");
             completionItem.setDetail("Snippet");
             completionItem.setKind(CompletionItemKind.Snippet);
-            return Either.forLeft(Arrays.asList(completionItem));
+            return Either.forLeft(List.of(completionItem));
         });
     }
 

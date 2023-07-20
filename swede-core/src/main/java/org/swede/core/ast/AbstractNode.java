@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import org.swede.core.common.Position;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -22,10 +21,7 @@ public abstract class AbstractNode {
 
     public <T extends AbstractNode> List<T> getChildrenByClass(Class<T> classSelector) {
         //noinspection unchecked
-        return children.stream()
-                .filter(abstractNode -> abstractNode.getClass().isAssignableFrom(classSelector))
-                .map(abstractNode -> (T) abstractNode)
-                .collect(Collectors.toList());
+        return children.stream().filter(abstractNode -> abstractNode.getClass().isAssignableFrom(classSelector)).map(abstractNode -> (T) abstractNode).collect(Collectors.toList());
     }
 
     public <T extends AbstractNode> Optional<T> getChildByClass(Class<T> classSelector) {
@@ -43,9 +39,5 @@ public abstract class AbstractNode {
 
     public void addChild(AbstractNode child) {
         children.add(child);
-    }
-
-    public void addChildren(Collection<AbstractNode> child) {
-        children.addAll(child);
     }
 }

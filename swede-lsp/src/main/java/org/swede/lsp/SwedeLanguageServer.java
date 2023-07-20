@@ -19,7 +19,7 @@ public class SwedeLanguageServer implements LanguageServer, LanguageClientAware 
     private int shutdown = 1;
 
     public SwedeLanguageServer() {
-        this.textDocumentService = new SwedeTextDocumentService(this);
+        this.textDocumentService = new SwedeTextDocumentService();
         this.workspaceService = new SwedeWorkspaceService(this);
     }
 
