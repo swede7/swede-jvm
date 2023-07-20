@@ -112,8 +112,8 @@ public class Interpreter {
         Pattern pattern = Pattern.compile(stepDefinition.getRegex());
         Matcher matcher = pattern.matcher(stepExpression);
 
-        if (matcher.find()) {
-            throw new IllegalStateException();
+        if (!matcher.find()) {
+            throw new RuntimeException();
         }
 
         for (int i = 1; i <= matcher.groupCount(); i++) {
