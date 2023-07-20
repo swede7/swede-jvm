@@ -6,18 +6,15 @@ import org.swede.core.interpreter.context.ScenarioContext;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CalculatorStepImpl {
-    @Step("Add 2 + 2")
-    public void addTwoPlusTwo(ScenarioContext scenarioContext) {
-        scenarioContext.put("result", 2 + 2);
+    @Step("Add <a> and <b>")
+    public void addTwoPlusTwo(int a, int b, ScenarioContext scenarioContext) {
+        scenarioContext.put("result", a + b);
+        System.out.println("Adding " + a + " and " + b);
     }
 
-    @Step("Add 2 + 3")
-    public void addTwoPlusThree(ScenarioContext scenarioContext) {
-        scenarioContext.put("result", 2 + 3);
-    }
-
-    @Step("Check that returned 4")
-    public void checkThatReturnedFour(ScenarioContext scenarioContext) {
-        assertEquals(4, scenarioContext.get("result"));
+    @Step("Check that result is <value>")
+    public void checkThatResultIsFour(int value, ScenarioContext scenarioContext) {
+        System.out.println("Checking that result is " + value);
+        assertEquals(value, scenarioContext.get("result"));
     }
 }

@@ -4,5 +4,5 @@ Feature: calculator
 
 @pass @automated
 Scenario: Test addition
-- Add 2 + 2
-- Check that returned 4
+- Add "2" and "2"
+- Check that result is "4"

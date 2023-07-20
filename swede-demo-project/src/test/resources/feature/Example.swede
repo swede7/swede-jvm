@@ -2,7 +2,11 @@
 Feature: Example feature
 
 Scenario: print message to console
-- print hello world
+- print "hello world"
+
+Scenario: put/get value to context
+- save message "lol it works" to context
+- print message from context
 
 Scenario: implemented steps should be skipped
 - not implemented step

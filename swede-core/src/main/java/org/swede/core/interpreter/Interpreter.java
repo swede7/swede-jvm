@@ -10,11 +10,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Interpreter {
 
-    private final Map<String, Action> actionMap = new HashMap<>();
+    private final Map<StepDefinition, Action> actionMap = new HashMap<>();
 
     public void registerActionClass(Class<?> actionClass) {
 
@@ -34,28 +37,18 @@ public class Interpreter {
             var stepExpression = stepAnnotation.value();
 
             var action = createAction(method, actionClassObject);
-            actionMap.put(stepExpression, action);
+
+            var stepDefinition = StepDefinitionParser.parse(stepExpression);
+            actionMap.put(stepDefinition, action);
         }
     }
 
     private Action createAction(Method method, Object actionClassObj) {
-        return (featureContext, scenarioContext) -> {
+        return (parameters, featureContext, scenarioContext) -> {
             try {
-                var methodParameters = method.getParameters();
+                List<Object> methodArgs = ParametersResolver.resolve(parameters, featureContext, scenarioContext, method);
 
-                var args = new ArrayList<>();
-
-                for (var parameter : methodParameters) {
-                    if (parameter.getType().equals(FeatureContext.class)) {
-                        args.add(featureContext);
-                    } else if (parameter.getType().equals(ScenarioContext.class)) {
-                        args.add(scenarioContext);
-                    } else {
-                        throw new RuntimeException("Unsupported parameter type");
-                    }
-                }
-
-                method.invoke(actionClassObj, args.toArray());
+                method.invoke(actionClassObj, methodArgs.toArray());
             } catch (InvocationTargetException e) {
                 return new ActionResult(ActionResult.ResultStatus.ERROR);
             } catch (Exception e) {
@@ -88,15 +81,42 @@ public class Interpreter {
         return status;
     }
 
-    private boolean executeStep(String stepName, ScenarioContext scenarioContext, FeatureContext featureContext) {
-        var action = actionMap.get(stepName);
+    private boolean executeStep(String stepExpression, ScenarioContext scenarioContext, FeatureContext featureContext) {
+        StepDefinition stepDefinition = findStepDefinition(stepExpression);
 
-        if (action == null) {
-            System.out.println(">>> step with name: " + stepName + " not implemented. skipping...");
+        if (stepDefinition == null) {
+            System.out.println(">>> step with name: " + stepExpression + " not implemented. skipping...");
             return true;
         }
+        var action = actionMap.get(stepDefinition);
 
-        var result = action.execute(featureContext, scenarioContext);
+        List<String> stepParameters = getStepParameters(stepDefinition, stepExpression);
+
+        var result = action.execute(stepParameters, featureContext, scenarioContext);
         return result.getStatus().equals(ActionResult.ResultStatus.OK);
+    }
+
+    private StepDefinition findStepDefinition(String step) {
+        for (var entry : actionMap.entrySet()) {
+            var stepDefinition = entry.getKey();
+            var stepDefinitionRegex = stepDefinition.getRegex();
+            if (Pattern.matches(stepDefinitionRegex, step)) {
+                return stepDefinition;
+            }
+        }
+        return null;
+    }
+
+    private List<String> getStepParameters(StepDefinition stepDefinition, String stepExpression) {
+        List<String> result = new ArrayList<>();
+
+        Pattern pattern = Pattern.compile(stepDefinition.getRegex());
+        Matcher matcher = pattern.matcher(stepExpression);
+
+        matcher.find();
+        for (int i = 1; i <= matcher.groupCount(); i++) {
+            result.add(matcher.group(i));
+        }
+        return result;
     }
 }
