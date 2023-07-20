@@ -26,7 +26,9 @@ public class Formatter {
 
     private void formatDocumentNode(DocumentNode node, StringBuilder builder) {
         List<TagNode> tags = node.getChildrenByClass(TagNode.class);
-        formatTags(tags, builder);
+        if (tags.size() > 0) {
+            formatTags(tags, builder);
+        }
 
         String description = node.getDescription();
         builder.append("Feature: ").append(description.trim()).append(END_OF_LINE).append(END_OF_LINE);
@@ -48,7 +50,9 @@ public class Formatter {
 
     private void formatScenarioNode(ScenarioNode node, StringBuilder builder) {
         List<TagNode> tags = node.getChildrenByClass(TagNode.class);
-        formatTags(tags, builder);
+        if (tags.size() > 0) {
+            formatTags(tags, builder);
+        }
 
         String description = node.getDescription();
         builder.append("Scenario: ").append(description).append(END_OF_LINE);

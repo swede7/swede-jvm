@@ -4,7 +4,7 @@ import picocli.CommandLine;
 
 @CommandLine.Command(
         name = "swede",
-        subcommands = {LspCommand.class, VersionCommand.class}
+        subcommands = {LspCommand.class, VersionCommand.class, FormatCommand.class}
 )
 public class BaseCommand {
 }
