@@ -7,16 +7,23 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class ParametersResolver {
+public final class StepImplementationMethodParametersResolver {
 
-    private ParametersResolver() {
+    private StepImplementationMethodParametersResolver() {
 
     }
 
-    public static List<Object> resolve(List<String> stepParameters, FeatureContext featureContext, ScenarioContext scenarioContext, Method method) {
+    /**
+     * @param stepParameters           step parameters
+     * @param featureContext           feature context that can used in step implementation
+     * @param scenarioContext          scenario context that can used in step implementation
+     * @param stepImplementationMethod step implementation method
+     * @return list of argument values with which the method will be executed.
+     */
+    public static List<Object> resolve(List<String> stepParameters, FeatureContext featureContext, ScenarioContext scenarioContext, Method stepImplementationMethod) {
         List<Object> result = new ArrayList<>();
 
-        var methodParameters = method.getParameters();
+        var methodParameters = stepImplementationMethod.getParameters();
 
         int stepParameterIndex = 0;
 

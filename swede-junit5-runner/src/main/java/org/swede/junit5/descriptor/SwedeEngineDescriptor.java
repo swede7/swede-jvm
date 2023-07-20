@@ -1,4 +1,4 @@
-package org.swede.junit5;
+package org.swede.junit5.descriptor;
 
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;

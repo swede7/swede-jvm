@@ -5,16 +5,14 @@ import org.swede.core.parser.Parser;
 
 import java.util.List;
 
-public class Formatter {
+public final class Formatter {
     private static final String END_OF_LINE = "\n";
-    private final String code;
 
 
-    public Formatter(String code) {
-        this.code = code;
+    private Formatter(String code) {
     }
 
-    public String format() {
+    public static String format(String code) {
         Parser parser = new Parser(code);
         var rootNode = parser.parse();
 
@@ -24,7 +22,7 @@ public class Formatter {
         return builder.toString();
     }
 
-    private void formatDocumentNode(DocumentNode node, StringBuilder builder) {
+    private static void formatDocumentNode(DocumentNode node, StringBuilder builder) {
         List<TagNode> tags = node.getChildrenByClass(TagNode.class);
         if (tags.size() > 0) {
             formatTags(tags, builder);
@@ -43,12 +41,12 @@ public class Formatter {
         }
     }
 
-    private void formatCommentNode(CommentNode node, StringBuilder builder) {
+    private static void formatCommentNode(CommentNode node, StringBuilder builder) {
         String comment = node.getComment();
         builder.append("# ").append(comment.trim()).append(END_OF_LINE).append(END_OF_LINE);
     }
 
-    private void formatScenarioNode(ScenarioNode node, StringBuilder builder) {
+    private static void formatScenarioNode(ScenarioNode node, StringBuilder builder) {
         List<TagNode> tags = node.getChildrenByClass(TagNode.class);
         if (tags.size() > 0) {
             formatTags(tags, builder);
@@ -65,11 +63,11 @@ public class Formatter {
         builder.append(END_OF_LINE);
     }
 
-    private void formatStepNode(StepNode node, StringBuilder builder) {
+    private static void formatStepNode(StepNode node, StringBuilder builder) {
         builder.append("- ").append(node.getText().trim()).append(END_OF_LINE);
     }
 
-    private void formatTags(List<TagNode> tags, StringBuilder builder) {
+    private static void formatTags(List<TagNode> tags, StringBuilder builder) {
         assert tags.size() > 0;
 
         for (int i = 0; i < tags.size() - 1; i++) {

@@ -9,7 +9,6 @@ import java.util.function.Supplier;
 
 public abstract class AbstractParser {
 
-
     private final String code;
     private int textCharIndex;
     private int lineCharIndex;

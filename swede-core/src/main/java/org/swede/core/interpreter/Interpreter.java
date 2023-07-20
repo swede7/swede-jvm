@@ -17,44 +17,43 @@ import java.util.regex.Pattern;
 
 public class Interpreter {
 
-    private final Map<StepDefinition, Action> actionMap = new HashMap<>();
+    private final Map<StepDefinition, StepAction> stepActionsMap = new HashMap<>();
 
-    public void registerActionClass(Class<?> actionClass) {
+    public void registerStepsImplementationClass(Class<?> stepsImplementationClass) {
+        Object stepsImplementationClassObject;
 
-        Object actionClassObject;
         try {
-            actionClassObject = actionClass.getDeclaredConstructor().newInstance();
+            stepsImplementationClassObject = stepsImplementationClass.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
-        for (var method : actionClass.getMethods()) {
+        for (var method : stepsImplementationClass.getMethods()) {
             if (method.getAnnotation(Step.class) == null) {
                 continue;
             }
 
-            var stepAnnotation = method.getAnnotation(Step.class);
-            var stepExpression = stepAnnotation.value();
+            var stepMethodAnnotation = method.getAnnotation(Step.class);
+            String stepExpression = stepMethodAnnotation.value();
 
-            var action = createAction(method, actionClassObject);
+            StepDefinition stepDefinition = StepDefinitionParser.parse(stepExpression);
+            var action = createStepAction(method, stepsImplementationClassObject);
 
-            var stepDefinition = StepDefinitionParser.parse(stepExpression);
-            actionMap.put(stepDefinition, action);
+            stepActionsMap.put(stepDefinition, action);
         }
     }
 
-    private Action createAction(Method method, Object actionClassObj) {
+    private StepAction createStepAction(Method stepImplementationMethod, Object stepsImpementationClassObject) {
         return (parameters, featureContext, scenarioContext) -> {
             try {
-                List<Object> methodArgs = ParametersResolver.resolve(parameters, featureContext, scenarioContext, method);
-
-                method.invoke(actionClassObj, methodArgs.toArray());
+                List<Object> args = StepImplementationMethodParametersResolver.resolve(parameters, featureContext, scenarioContext, stepImplementationMethod);
+                stepImplementationMethod.invoke(stepsImpementationClassObject, args.toArray());
             } catch (InvocationTargetException e) {
-                return new ActionResult(ActionResult.ResultStatus.ERROR);
+                return new StepExecutionResult(StepExecutionResult.ResultStatus.ERROR);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-            return new ActionResult(ActionResult.ResultStatus.OK);
+            return new StepExecutionResult(StepExecutionResult.ResultStatus.OK);
         };
     }
 
@@ -88,16 +87,16 @@ public class Interpreter {
             System.out.println(">>> step with name: " + stepExpression + " not implemented. skipping...");
             return true;
         }
-        var action = actionMap.get(stepDefinition);
+        var action = stepActionsMap.get(stepDefinition);
 
         List<String> stepParameters = getStepParameters(stepDefinition, stepExpression);
 
         var result = action.execute(stepParameters, featureContext, scenarioContext);
-        return result.getStatus().equals(ActionResult.ResultStatus.OK);
+        return result.getStatus().equals(StepExecutionResult.ResultStatus.OK);
     }
 
     private StepDefinition findStepDefinition(String step) {
-        for (var entry : actionMap.entrySet()) {
+        for (var entry : stepActionsMap.entrySet()) {
             var stepDefinition = entry.getKey();
             var stepDefinitionRegex = stepDefinition.getRegex();
             if (Pattern.matches(stepDefinitionRegex, step)) {
@@ -113,7 +112,10 @@ public class Interpreter {
         Pattern pattern = Pattern.compile(stepDefinition.getRegex());
         Matcher matcher = pattern.matcher(stepExpression);
 
-        matcher.find();
+        if (matcher.find()) {
+            throw new IllegalStateException();
+        }
+
         for (int i = 1; i <= matcher.groupCount(); i++) {
             result.add(matcher.group(i));
         }

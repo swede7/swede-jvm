@@ -1,8 +1,8 @@
 package org.swede.core.command;
 
-import picocli.CommandLine;
+import picocli.CommandLine.Command;
 
-@CommandLine.Command(
+@Command(
         name = "swede",
         subcommands = {LspCommand.class, VersionCommand.class, FormatCommand.class}
 )

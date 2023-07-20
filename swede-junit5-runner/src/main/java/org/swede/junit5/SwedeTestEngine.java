@@ -1,6 +1,7 @@
 package org.swede.junit5;
 
 import org.junit.platform.engine.*;
+import org.swede.junit5.descriptor.SwedeEngineDescriptor;
 import org.swede.junit5.descriptor.SwedeFeatureFileDescriptor;
 
 import java.io.File;
@@ -9,7 +10,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class SwedeTestEngine implements TestEngine {
-
 
     private static final String ENGINE_ID = "swede";
 
@@ -22,8 +22,7 @@ public class SwedeTestEngine implements TestEngine {
     public TestDescriptor discover(EngineDiscoveryRequest request, UniqueId uniqueId) {
         var engineDescriptor = new SwedeEngineDescriptor(uniqueId);
 
-        var configurationResolver = new ConfigurationResolver();
-        List<SwedeExecuteConfiguration> configurations = configurationResolver.findExecuteConfigurations(request);
+        List<SwedeExecuteConfiguration> configurations = SwedeExecuteConfigurationResolver.findExecuteConfigurations(request);
         if (configurations.size() != 1) {
             return engineDescriptor;
         }

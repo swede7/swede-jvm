@@ -14,11 +14,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-public class ConfigurationResolver {
+public final class SwedeExecuteConfigurationResolver {
+    private SwedeExecuteConfigurationResolver() {
+
+    }
 
     private static final Predicate<Class<?>> CONTAINS_SWEDE_TEST_ANNOTATION_PREDICATE = classCandidate -> AnnotationSupport.isAnnotated(classCandidate, SwedeTest.class);
 
-    public List<SwedeExecuteConfiguration> findExecuteConfigurations(EngineDiscoveryRequest request) {
+    public static List<SwedeExecuteConfiguration> findExecuteConfigurations(EngineDiscoveryRequest request) {
         var configurations = new ArrayList<SwedeExecuteConfiguration>();
 
         request.getSelectorsByType(ClassSelector.class).forEach(classSelector -> {
@@ -37,17 +40,17 @@ public class ConfigurationResolver {
         return configurations;
     }
 
-    private List<SwedeExecuteConfiguration> findExecuteConfigurationsInClasspathRoot(URI uri) {
+    private static List<SwedeExecuteConfiguration> findExecuteConfigurationsInClasspathRoot(URI uri) {
         return ReflectionSupport.findAllClassesInClasspathRoot(uri, CONTAINS_SWEDE_TEST_ANNOTATION_PREDICATE, name -> true) //
-                .stream().map(this::findExecuteConfigurationInClass).filter(Optional::isPresent).map(Optional::get).toList();
+                .stream().map(SwedeExecuteConfigurationResolver::findExecuteConfigurationInClass).filter(Optional::isPresent).map(Optional::get).toList();
     }
 
-    private List<SwedeExecuteConfiguration> findExecuteConfigurationsInPackage(String packageName) {
+    private static List<SwedeExecuteConfiguration> findExecuteConfigurationsInPackage(String packageName) {
         return ReflectionSupport.findAllClassesInPackage(packageName, CONTAINS_SWEDE_TEST_ANNOTATION_PREDICATE, name -> true) //
-                .stream().map(this::findExecuteConfigurationInClass).filter(Optional::isPresent).map(Optional::get).toList();
+                .stream().map(SwedeExecuteConfigurationResolver::findExecuteConfigurationInClass).filter(Optional::isPresent).map(Optional::get).toList();
     }
 
-    private Optional<SwedeExecuteConfiguration> findExecuteConfigurationInClass(Class<?> javaClass) {
+    private static Optional<SwedeExecuteConfiguration> findExecuteConfigurationInClass(Class<?> javaClass) {
         var annotation = javaClass.getAnnotation(SwedeTest.class);
 
         if (annotation == null) {

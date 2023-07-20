@@ -16,8 +16,7 @@ class FormatterTest {
         String code = readFromFile("code/good-case.speca");
         String expectedFormattedCode = readFromFile("code/formatted-good-case.speca");
 
-        Formatter formatter = new Formatter(code);
-        String formattedText = formatter.format();
+        String formattedText = Formatter.format(code);
 
         assertEquals(expectedFormattedCode, formattedText);
     }

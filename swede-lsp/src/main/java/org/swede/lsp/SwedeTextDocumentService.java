@@ -76,8 +76,7 @@ public class SwedeTextDocumentService implements TextDocumentService {
         return CompletableFuture.supplyAsync(() -> {
             String code = CodeHolder.getCode();
             try {
-                Formatter formatter = new Formatter(code);
-                String formattedCode = formatter.format();
+                String formattedCode = Formatter.format(code);
 
                 String[] codeLines = code.split("\\R");
 
@@ -97,8 +96,7 @@ public class SwedeTextDocumentService implements TextDocumentService {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 String code = CodeHolder.getCode();
-                Highlighter highlighter = new Highlighter(code);
-                List<Token> tokens = highlighter.highlight();
+                List<Token> tokens = Highlighter.highlight(code);
                 return TokenMapper.mapTokens(tokens);
             } catch (Exception e) {
                 return new SemanticTokens(List.of());

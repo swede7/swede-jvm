@@ -1,8 +1,8 @@
 package org.swede.core.command;
 
-import picocli.CommandLine;
+import picocli.CommandLine.Command;
 
-@CommandLine.Command(name = "version")
+@Command(name = "version")
 public class VersionCommand implements Runnable {
 
     private static final String VERSION = "0.1";

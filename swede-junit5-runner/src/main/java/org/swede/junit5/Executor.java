@@ -5,7 +5,7 @@ import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
 import org.swede.core.ast.DocumentNode;
 import org.swede.core.interpreter.Interpreter;
-import org.swede.core.interpreter.SwedeScenarioFailedException;
+import org.swede.core.interpreter.exception.SwedeScenarioFailedException;
 import org.swede.core.parser.Parser;
 import org.swede.junit5.descriptor.SwedeFeatureFileDescriptor;
 
@@ -30,6 +30,7 @@ public class Executor {
     private void executeSwedeFeatureFiles() {
         for (var descriptor : rootDescriptor.getChildren()) {
             request.getEngineExecutionListener().executionStarted(descriptor);
+
             var swedeFileDescriptor = (SwedeFeatureFileDescriptor) descriptor;
 
             File featureFile = swedeFileDescriptor.getFeatureFile();
@@ -44,7 +45,7 @@ public class Executor {
             DocumentNode documentNode = parser.parse();
 
             Interpreter interpreter = new Interpreter();
-            interpreter.registerActionClass(swedeFileDescriptor.getStepImplClass());
+            interpreter.registerStepsImplementationClass(swedeFileDescriptor.getStepImplClass());
             boolean status = interpreter.execute(documentNode);
 
             request.getEngineExecutionListener().executionFinished(descriptor, status ? TestExecutionResult.successful() : TestExecutionResult.failed(new SwedeScenarioFailedException()));

@@ -1,7 +1,7 @@
 package org.swede.core.command;
 
 import org.swede.core.formatter.Formatter;
-import picocli.CommandLine;
+import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
 import java.io.IOException;
@@ -9,7 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-@CommandLine.Command(name = "format")
+@Command(name = "format")
 public class FormatCommand implements Runnable {
 
     @Parameters(index = "0", description = "The path of file that needs to be formatted")
@@ -18,8 +18,7 @@ public class FormatCommand implements Runnable {
     @Override
     public void run() {
         String code = readFormFile();
-        Formatter formatter = new Formatter(code);
-        String formattedCode = formatter.format();
+        String formattedCode = Formatter.format(code);
         writeToFile(formattedCode);
     }
 

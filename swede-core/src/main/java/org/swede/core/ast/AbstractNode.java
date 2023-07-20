@@ -38,7 +38,7 @@ public abstract class AbstractNode {
             return Optional.of(filteredChildren.get(0));
 
         }
-        throw new RuntimeException("oops");
+        throw new RuntimeException("found several children nodes");
     }
 
     public void addChild(AbstractNode child) {

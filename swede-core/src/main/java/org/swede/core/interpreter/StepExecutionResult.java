@@ -3,17 +3,17 @@ package org.swede.core.interpreter;
 import lombok.Data;
 
 @Data
-public class ActionResult {
+public class StepExecutionResult {
 
     private ResultStatus status;
     private String message;
 
 
-    public ActionResult(ResultStatus status) {
+    public StepExecutionResult(ResultStatus status) {
         this.status = status;
     }
 
-    public ActionResult(ResultStatus status, String message) {
+    public StepExecutionResult(ResultStatus status, String message) {
         this.status = status;
         this.message = message;
     }

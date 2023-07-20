@@ -6,15 +6,13 @@ import org.swede.core.parser.Parser;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Highlighter {
-    private final String code;
+public final class Highlighter {
 
+    private Highlighter() {
 
-    public Highlighter(String code) {
-        this.code = code;
     }
 
-    public List<Token> highlight() {
+    public static List<Token> highlight(String code) {
         Parser parser = new Parser(code);
 
         DocumentNode documentNode = parser.parse();
@@ -24,7 +22,7 @@ public class Highlighter {
         return tokens;
     }
 
-    private void processNode(AbstractNode node, List<Token> tokens) {
+    private static void processNode(AbstractNode node, List<Token> tokens) {
         Token token = new Token();
         token.setStartPosition(node.getStartPosition());
         token.setEndPosition(node.getEndPosition());
