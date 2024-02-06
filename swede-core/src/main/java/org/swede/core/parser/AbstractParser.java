@@ -25,12 +25,12 @@ public abstract class AbstractParser {
     }
 
     public Position getPosition() {
-        return new Position(textCharIndex, lineCharIndex, line);
+        return new Position(textCharIndex, line, lineCharIndex);
     }
 
     public void setPosition(Position position) {
-        this.textCharIndex = position.textCharIndex();
-        this.lineCharIndex = position.lineCharIndex();
+        this.textCharIndex = position.offset();
+        this.lineCharIndex = position.column();
         this.line = position.line();
     }
 

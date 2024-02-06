@@ -1,5 +1,5 @@
 package org.swede.core.common;
 
-public record Position(int textCharIndex, int lineCharIndex, int line) {
+public record Position(int offset, int line, int column) {
 
 }

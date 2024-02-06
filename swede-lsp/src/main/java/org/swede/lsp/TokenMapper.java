@@ -28,14 +28,14 @@ public final class TokenMapper {
 
             int deltaStart;
             if (deltaLine == 0) {
-                deltaStart = prevToken == null ? startPosition.lineCharIndex() : startPosition.lineCharIndex() - prevToken.getStartPosition().lineCharIndex();
+                deltaStart = prevToken == null ? startPosition.column() : startPosition.column() - prevToken.getStartPosition().column();
             } else {
-                deltaStart = startPosition.lineCharIndex();
+                deltaStart = startPosition.column();
             }
             data.add(deltaStart);
 
 
-            int length = endPosition.textCharIndex() - startPosition.textCharIndex();
+            int length = endPosition.offset() - startPosition.offset();
             data.add(length);
 
             int tokenType = mapTokenType(token.getType());
