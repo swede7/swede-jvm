@@ -1,281 +1,120 @@
 package org.swede.core.parser;
 
 
-import org.swede.core.ast.*;
-import org.swede.core.common.Position;
+import org.swede.core.ast.CommentNode;
+import org.swede.core.ast.DocumentNode;
+import org.swede.core.ast.StepNode;
+import org.swede.core.lexer.Token;
 
-public class Parser extends AbstractParser {
+import java.util.List;
 
-    private static final char TAG_CHAR = '@';
+public class Parser {
 
+    private final List<Token> tokens;
+    private int pos;
 
-    public Parser(String code) {
-        super(code);
+    public Parser(List<Token> tokens) {
+        this.tokens = tokens;
+    }
+
+    private Token peek() {
+        return tokens.get(pos);
+    }
+
+    public void advance() {
+        pos++;
+    }
+
+    private boolean isEof() {
+        return pos >= tokens.size();
     }
 
 
-    @Override
     public DocumentNode parse() {
-        if (!parseDocument()) {
-            throw new RuntimeException("parsing error");
-        }
+        // document: expression
+        // expression: feature | scenario | comment | emptyline
+        // feature: (tags)? FEATURE_WORD .* NL
+        // comment: DASH .* NL
+        // scenario: (tags)? SCENARIO_WORD NL step*
+        // step: DASH .* NL
+        // tags: (tag SPACE?) NL
+        // tag: AT WORD
+        // emptyline: SPACE? NL
 
-        if (getNodes().size() != 1) {
-            throw new RuntimeException("parsing error");
-        }
-        return getNode(0, DocumentNode.class);
-    }
 
-    private boolean parseDocument() {
-        Position startPos = getPosition();
-        int startNodesCount = getNodes().size();
-        DocumentNode documentNode = new DocumentNode();
-
-        if (parseTags() && parseKeyword("Feature:") && parseText() && parseMany(this::parseExpression)) {
-            int endNodesCount = getNodes().size();
-            for (int i = startNodesCount; i < endNodesCount; i++) {
-                documentNode.addChild(getNode(i));
-            }
-
-            for (int i = startNodesCount; i < endNodesCount; i++) {
-                removeNode(getNodes().size() - 1);
-            }
-            addNode(documentNode);
-            return true;
-        }
-
-        if (parseKeyword("Feature:") && parseText() && parseMany(this::parseExpression)) {
-            int endNodesCount = getNodes().size();
-            for (int i = startNodesCount; i < endNodesCount; i++) {
-                documentNode.addChild(getNode(i));
-            }
-
-            for (int i = startNodesCount; i < endNodesCount; i++) {
-                removeNode(getNodes().size() - 1);
-            }
-            addNode(documentNode);
-            return true;
-        }
-
-        // rollback
-        setPosition(startPos);
-        return false;
-
-    }
-
-    // _ -> (CommentNode | ScenarioNode)*
-    private boolean parseExpression() {
-        Position startPos = getPosition();
-
-        if (isEOF() || !parseMany(() -> parseComment() || parseScenario() || parseAndSkipWS())) {
-            // else rollback
-            setPosition(startPos);
-            return false;
-        }
-        return true;
-    }
-
-    private boolean parseAndSkipWS() {
-        Position startPos = getPosition();
-
-        if (isEOF() || !parseMany(() -> parseAndSkipChar(' ') || parseAndSkipEL())) {
-            // else rollback
-            setPosition(startPos);
-            return false;
-        }
-        return true;
-    }
-
-    // _ -> TagNode+
-    private boolean parseTags() {
-        Position startPos = getPosition();
-
-        if (!parseTag()) {
-            // else rollback
-            setPosition(startPos);
-            return false;
-        }
-
-        parseMany(() -> parseAndSkipChar(' ') || parseTag());
-
-        if (parseAndSkipEL()) {
-            return true;
-        }
-        //rollback
-        setPosition(startPos);
-        return false;
-    }
-
-    // _ -> TagNode
-    private boolean parseTag() {
-        Position startPos = getPosition();
-
-        if (isEOF() || !parseAndSkipChar(TAG_CHAR)) {
-            //rollback
-            setPosition(startPos);
-            return false;
-        }
-
-        var builder = new StringBuilder();
-
-        while (!isEOF() && (Character.isAlphabetic(peek()) || Character.isDigit(peek()))) {
-            builder.append(next());
-        }
-
-        if (builder.length() == 0) {
-            //rollback
-            setPosition(startPos);
-            return false;
-        }
-
-        var tagNode = new TagNode(builder.toString());
-        tagNode.setStartPosition(startPos);
-        tagNode.setEndPosition(getPosition());
-        addNode(tagNode);
-        return true;
-    }
-
-    // (TagNode+)? TextNode StepNode* -> ScenarioNode
-    private boolean parseScenario() {
-        Position startPos = getPosition();
-        int startNodesCount = getNodes().size();
-
-        var scenarioNode = new ScenarioNode();
-
-        // optional - parse tags
-        if (parseTags()) {
-            int endNodesCount = getNodes().size();
-
-            for (int i = startNodesCount; i < endNodesCount; i++) {
-                var tagNode = (TagNode) getNode(i);
-                scenarioNode.addChild(tagNode);
-            }
-
-            for (int i = 0; i < endNodesCount - startNodesCount; i++) {
-                removeNode(getNodes().size() - 1);
+        while (!isEof()) {
+            switch (peek().getType()) {
+                case HASH_CHR -> parseComment();
+                case DASH_CHR -> parseStep();
             }
         }
 
-        if (parseKeyword("Scenario:") && parseText() && parseMany(this::parseStep)) {
-            int endNodesCount = getNodes().size();
 
-            var keywordNode = getNode(startNodesCount, KeywordNode.class);
-            scenarioNode.addChild(keywordNode);
-
-            var textNode = getNode(startNodesCount + 1, TextNode.class);
-            scenarioNode.addChild(textNode);
-
-            for (int i = startNodesCount + 2; i < endNodesCount; i++) {
-                var stepNode = (StepNode) getNode(i);
-                scenarioNode.addChild(stepNode);
-            }
-
-            for (int i = 0; i < endNodesCount - startNodesCount; i++) {
-                removeNode(getNodes().size() - 1);
-            }
-
-            addNode(scenarioNode);
-            return true;
-        }
-
-        // else revert
-        setPosition(startPos);
-
-        while (startNodesCount != getNodes().size()) {
-            removeNode(getNodes().size() - 1);
-        }
-
-        return false;
+        return null;
     }
 
 
-    // TextNode -> StepNode
-    private boolean parseStep() {
-        Position startPos = getPosition();
-
-        if (!parseAndSkipChar('-') || !parseText()) {
-            //rollback
-            setPosition(startPos);
-            return false;
+    private CommentNode parseComment() {
+        if (peek().getType() != Token.TokenType.HASH_CHR) {
+            throw new IllegalStateException();
         }
 
-        var textNode = getNode(getNodes().size() - 1, TextNode.class);
-        removeNode(getNodes().size() - 1);
-
-        var stepNode = new StepNode(textNode.getText());
-        stepNode.setStartPosition(startPos);
-        stepNode.setEndPosition(getPosition());
-        addNode(stepNode);
-        return true;
-    }
-
-
-    // TextNode -> CommentNode
-    private boolean parseComment() {
-        Position startPos = getPosition();
-
-        if (!parseAndSkipChar('#') || !parseText()) {
-            //rollback
-            setPosition(startPos);
-            return false;
-        }
-
-        var textNode = getNode(getNodes().size() - 1, TextNode.class);
-        removeNode(getNodes().size() - 1);
-
-        var commentNode = new CommentNode(textNode.getText());
-        commentNode.setStartPosition(startPos);
-        commentNode.setEndPosition(getPosition());
-        addNode(commentNode);
-        return true;
-    }
-
-    // _ -> TextNode
-    private boolean parseText() {
         StringBuilder builder = new StringBuilder();
 
-        while (!isEOF() && !parseAndSkipEL()) {
-            builder.append(next());
+        var startPosition = peek().getStartPosition();
+        var endPosition = startPosition;
+
+        while (!isEof() && peek().getType() != Token.TokenType.NL) {
+            builder.append(peek().getValue());
+            endPosition = peek().getEndPosition();
+            advance();
         }
 
-        if (builder.length() == 0) {
+        var node = new CommentNode();
+        node.setStartPosition(startPosition);
+        node.setEndPosition(endPosition);
+        node.setComment(builder.toString());
+        return node;
+    }
+
+    private StepNode parseStep() {
+        if (peek().getType() != Token.TokenType.DASH_CHR) {
+            throw new IllegalStateException();
+        }
+
+        StringBuilder builder = new StringBuilder();
+
+        var startPosition = peek().getStartPosition();
+        var endPosition = startPosition;
+
+        while (!isEof() && peek().getType() != Token.TokenType.NL) {
+            builder.append(peek().getValue());
+            endPosition = peek().getEndPosition();
+            advance();
+        }
+
+        var node = new StepNode();
+        node.setStartPosition(startPosition);
+        node.setEndPosition(endPosition);
+        node.setText(builder.toString());
+        return node;
+    }
+
+    boolean matchType(Token.TokenType type) {
+        if (peek().getType() != type) {
             return false;
         }
-
-        var textNode = new TextNode(builder.toString());
-        addNode(textNode);
+        advance();
         return true;
     }
 
-    private boolean parseAndSkipEL() {
-        Position startPos = getPosition();
-
-        if (!isEOF() && peek() == '\r') {
-            next();
+    private void parseTag() {
+        if (matchType(Token.TokenType.AT_CHR)) {
+            throw new IllegalStateException();
         }
 
-        if (!isEOF() && peek() == '\n') {
-            next();
-            return true;
-        }
 
-        setPosition(startPos);
-        return false;
     }
 
-    // _ -> KeywordToken
-    private boolean parseKeyword(String text) {
-        Position startPos = getPosition();
-
-        if (!parseAndSkipString(text)) {
-            return false;
-        }
-        var keywordNode = new KeywordNode();
-        keywordNode.setStartPosition(startPos);
-        keywordNode.setEndPosition(getPosition());
-
-        addNode(keywordNode);
-        return true;
-    }
 
 }
