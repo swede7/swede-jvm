@@ -7,8 +7,8 @@ public final class Utils {
     private Utils() {
     }
 
-    public static void visitTree(AbstractNode node, Consumer<AbstractNode> consumer) {
-        for (AbstractNode child : node.getChildren()) {
+    public static void visitTree(Node node, Consumer<Node> consumer) {
+        for (Node child : node.getChildren()) {
             visitTree(child, consumer);
         }
         consumer.accept(node);

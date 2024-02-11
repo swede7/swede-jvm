@@ -8,15 +8,15 @@ import javax.annotation.Nullable;
 
 @Data
 @AllArgsConstructor
-public class Token {
-    private TokenType type;
+public class Lexeme {
+    private LexemeType type;
     private Position startPosition;
     private Position endPosition;
     @Nullable
     private String value;
 
 
-    public enum TokenType {
+    public enum LexemeType {
         NL,
         AT_CHR,
         DASH_CHR,
