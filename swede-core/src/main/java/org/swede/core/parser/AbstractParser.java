@@ -29,6 +29,10 @@ public abstract class AbstractParser {
         return nodes;
     }
 
+    protected List<ParserError> getErrors() {
+        return errors;
+    }
+
     protected void advance() {
         advance(1);
     }

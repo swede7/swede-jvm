@@ -1,6 +1,7 @@
 package org.swede.core.ast;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.swede.core.common.Position;
 
@@ -10,6 +11,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class Node {
     private NodeType type;
     private List<Node> children = new LinkedList<>();
@@ -31,6 +33,7 @@ public class Node {
 
 
     public enum NodeType {
+        ROOT,
         UNEXPECTED,
         COMMENT,
         DOCUMENT,

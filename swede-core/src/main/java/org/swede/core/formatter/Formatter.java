@@ -1,30 +1,31 @@
-//package org.swede.core.formatter;
-//
-//import org.swede.core.ast.*;
-//import org.swede.core.lexer.Lexer;
-//import org.swede.core.parser.Parser;
-//
-//import java.util.List;
-//
-//public final class Formatter {
-//    private static final String END_OF_LINE = "\n";
-//
-//
-//    private Formatter() {
-//    }
-//
-//    public static String format(String code) {
+package org.swede.core.formatter;
+
+public final class Formatter {
+    private static final String END_OF_LINE = "\n";
+
+
+    private Formatter() {
+    }
+
+    public static String format(String code) {
+        //todo fix it
+        return code;
 //        Lexer lexer = new Lexer(code);
 //        Parser parser = new Parser(lexer.scan());
-//        var rootNode = parser.parse();
+//        var parserResult = parser.parse();
+//
+//        // not format it if some errors found
+//        if (!parserResult.getErrors().isEmpty()) {
+//            return code;
+//        }
+//
+//        var rootNode = parserResult.getRootNode();
 //
 //        var builder = new StringBuilder();
 //        formatDocumentNode(rootNode, builder);
-//
-//        return builder.toString();
-//    }
-//
-//    private static void formatDocumentNode(DocumentNode node, StringBuilder builder) {
+    }
+
+//    private static void formatDocumentNode(Node node, StringBuilder builder) {
 //        List<TagNode> tags = node.getChildrenByClass(TagNode.class);
 //        if (tags.size() > 0) {
 //            formatTags(tags, builder);
@@ -79,6 +80,6 @@
 //        builder.append("@").append(tags.get(tags.size() - 1).getName());
 //        builder.append(END_OF_LINE);
 //    }
-//
-//
-//}
+
+
+}

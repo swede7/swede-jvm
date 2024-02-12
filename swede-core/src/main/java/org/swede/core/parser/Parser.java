@@ -3,6 +3,7 @@ package org.swede.core.parser;
 
 import org.swede.core.ast.Node;
 import org.swede.core.ast.Node.NodeType;
+import org.swede.core.common.Position;
 import org.swede.core.lexer.Lexeme;
 
 import java.util.List;
@@ -11,19 +12,7 @@ import java.util.function.Supplier;
 
 public class Parser extends AbstractParser {
 
-    private final List<Supplier<Boolean>> RULES = List.of(
-            this::addTagToFeatureRule,
-            this::addTagToScenarioRule,
-            this::addStepToScenarioRule,
-            this::skipSpacesAndNlRule,
-            this::commentRule,
-            this::tagRule,
-            this::featureRule,
-            this::scenarioRule,
-            this::stepRule,
-            this::handleUnexpectedLexemeRule,
-            this::handleUnexpectedNodesRule
-    );
+    private final List<Supplier<Boolean>> RULES = List.of(this::addTagToFeatureRule, this::addTagToScenarioRule, this::addStepToScenarioRule, this::skipSpacesAndNlRule, this::commentRule, this::tagRule, this::featureRule, this::scenarioRule, this::stepRule, this::handleUnexpectedLexemeRule, this::handleUnexpectedNodesRule);
 
 
     public Parser(List<Lexeme> tokens) {
@@ -31,7 +20,7 @@ public class Parser extends AbstractParser {
     }
 
 
-    public Node parse() {
+    public ParserResult parse() {
         while (true) {
             var anyRuleWasApplied = false;
             for (var rule : RULES) {
@@ -45,7 +34,20 @@ public class Parser extends AbstractParser {
             }
         }
 
-        return null;
+        var rootNode = new Node();
+        rootNode.setType(NodeType.ROOT);
+        rootNode.setStartPosition(new Position(0, 0, 0)); //todo fix it
+        rootNode.setEndPosition(new Position(0, 0, 0));
+        for (var node : getNodes()) {
+            rootNode.appendChild(node);
+            rootNode.setEndPosition(node.getEndPosition());
+        }
+
+        var parserResult = new ParserResult();
+        parserResult.setRootNode(rootNode);
+        parserResult.setErrors(getErrors());
+
+        return parserResult;
     }
 
 
@@ -260,9 +262,13 @@ public class Parser extends AbstractParser {
         final Set<NodeType> validNodeTypes = Set.of(NodeType.UNEXPECTED, NodeType.COMMENT, NodeType.FEATURE, NodeType.SCENARIO);
 
         boolean someNodesWasProcessed = false;
-        for (var node : nodes) {
+        for (var iterator = nodes.listIterator(); iterator.hasNext(); ) {
+            var node = iterator.next();
             if (!validNodeTypes.contains(node.getType())) {
-                node.setType(NodeType.UNEXPECTED);
+                var wrapperNode = new Node(NodeType.UNEXPECTED, node.getStartPosition(), node.getEndPosition(), node.getValue());
+                wrapperNode.appendChild(node);
+                iterator.set(wrapperNode);
+
                 addError(node.getStartPosition(), node.getEndPosition(), "unexpected node");
                 someNodesWasProcessed = true;
             }

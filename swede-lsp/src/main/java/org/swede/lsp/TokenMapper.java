@@ -35,7 +35,7 @@ public final class TokenMapper {
             data.add(deltaStart);
 
 
-            int length = endPosition.offset() - startPosition.offset();
+            int length = endPosition.offset() - startPosition.offset() + 1;
             data.add(length);
 
             int tokenType = mapTokenType(token.getType());
