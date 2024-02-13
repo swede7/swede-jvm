@@ -45,7 +45,7 @@ public class SwedeLanguageServer implements LanguageServer, LanguageClientAware 
             response.getCapabilities().setSemanticTokensProvider(semanticTokensWithRegistrationOptions);
         }
 
-        response.getCapabilities().setDocumentFormattingProvider(new DocumentFormattingOptions());
+        response.getCapabilities().setDiagnosticProvider(new DiagnosticRegistrationOptions());
 
         return CompletableFuture.supplyAsync(() -> response);
     }
