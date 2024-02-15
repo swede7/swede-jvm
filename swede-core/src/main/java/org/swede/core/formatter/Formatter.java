@@ -18,7 +18,7 @@ public final class Formatter {
 
         // not format it if some errors found
         if (!parserResult.getErrors().isEmpty()) {
-            return code;
+            throw new RuntimeException("Found errors in document");
         }
 
         var rootNode = parserResult.getRootNode();

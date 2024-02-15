@@ -18,9 +18,13 @@ public class SwedeLanguageServer implements LanguageServer, LanguageClientAware 
     private LanguageClient languageClient;
     private int shutdown = 1;
 
+    public LanguageClient getLanguageClient() {
+        return languageClient;
+    }
+
     public SwedeLanguageServer() {
-        this.textDocumentService = new SwedeTextDocumentService();
         this.workspaceService = new SwedeWorkspaceService(this);
+        this.textDocumentService = new SwedeTextDocumentService(this);
     }
 
     @Override
@@ -115,4 +119,6 @@ public class SwedeLanguageServer implements LanguageServer, LanguageClientAware 
         return textDocumentCapabilities != null && textDocumentCapabilities.getSemanticTokens() != null
                 && Boolean.TRUE.equals(textDocumentCapabilities.getSemanticTokens().getDynamicRegistration());
     }
+
+
 }

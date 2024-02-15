@@ -19,8 +19,10 @@ import java.util.concurrent.CompletableFuture;
 public class SwedeTextDocumentService implements TextDocumentService {
 
     private final LSClientLogger clientLogger;
+    private final SwedeLanguageServer swedeLanguageServer;
 
-    public SwedeTextDocumentService() {
+    public SwedeTextDocumentService(SwedeLanguageServer swedeLanguageServer) {
+        this.swedeLanguageServer = swedeLanguageServer;
         this.clientLogger = LSClientLogger.getInstance();
     }
 
@@ -75,7 +77,13 @@ public class SwedeTextDocumentService implements TextDocumentService {
     public CompletableFuture<List<? extends TextEdit>> formatting(DocumentFormattingParams params) {
         return CompletableFuture.supplyAsync(() -> {
             String code = CodeHolder.getCode();
-            String formattedCode = Formatter.format(code);
+            String formattedCode;
+            try {
+                formattedCode = Formatter.format(code);
+            } catch (RuntimeException e) {
+                formattedCode = code;
+                swedeLanguageServer.getLanguageClient().showMessage(new MessageParams(MessageType.Error, e.getMessage()));
+            }
 
             String[] codeLines = code.split("\\R");
 
@@ -129,7 +137,6 @@ public class SwedeTextDocumentService implements TextDocumentService {
             relatedFullDocumentDiagnosticReport.setItems(diagnostics);
 
             return new DocumentDiagnosticReport(relatedFullDocumentDiagnosticReport);
-
         });
     }
 }
