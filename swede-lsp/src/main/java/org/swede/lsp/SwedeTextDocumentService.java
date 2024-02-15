@@ -6,7 +6,10 @@ import org.eclipse.lsp4j.services.TextDocumentService;
 import org.swede.core.formatter.Formatter;
 import org.swede.core.highlighter.Highlighter;
 import org.swede.core.highlighter.Token;
+import org.swede.core.lexer.Lexer;
+import org.swede.core.parser.Parser;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -94,6 +97,39 @@ public class SwedeTextDocumentService implements TextDocumentService {
             } catch (Exception e) {
                 return new SemanticTokens(List.of());
             }
+        });
+    }
+
+    @Override
+    public CompletableFuture<DocumentDiagnosticReport> diagnostic(DocumentDiagnosticParams params) {
+        return CompletableFuture.supplyAsync(() -> {
+            String code = CodeHolder.getCode();
+            Lexer lexer = new Lexer(code);
+            Parser parser = new Parser(lexer.scan());
+
+            var parserResult = parser.parse();
+            var errors = parserResult.getErrors();
+
+            List<Diagnostic> diagnostics = new ArrayList<>();
+
+            for (var error : errors) {
+                var diagnostic = new Diagnostic();
+                diagnostic.setMessage(error.getMessage());
+
+                var range = new Range();
+                range.setStart(new Position(error.getStartPosition().line(), error.getStartPosition().column()));
+                range.setEnd(new Position(error.getEndPosition().line(), error.getEndPosition().column() + 1));
+                diagnostic.setRange(range);
+
+                diagnostics.add(diagnostic);
+            }
+
+
+            var relatedFullDocumentDiagnosticReport = new RelatedFullDocumentDiagnosticReport();
+            relatedFullDocumentDiagnosticReport.setItems(diagnostics);
+
+            return new DocumentDiagnosticReport(relatedFullDocumentDiagnosticReport);
+
         });
     }
 }
