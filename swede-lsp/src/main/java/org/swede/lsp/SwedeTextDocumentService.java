@@ -72,19 +72,15 @@ public class SwedeTextDocumentService implements TextDocumentService {
     public CompletableFuture<List<? extends TextEdit>> formatting(DocumentFormattingParams params) {
         return CompletableFuture.supplyAsync(() -> {
             String code = CodeHolder.getCode();
-            try {
-                String formattedCode = Formatter.format(code);
+            String formattedCode = Formatter.format(code);
 
-                String[] codeLines = code.split("\\R");
+            String[] codeLines = code.split("\\R");
 
-                Position startPosition = new Position(0, 0);
-                Position endPosition = new Position(codeLines.length - 1, codeLines[codeLines.length - 1].length());
-                Range range = new Range(startPosition, endPosition);
+            Position startPosition = new Position(0, 0);
+            Position endPosition = new Position(codeLines.length - 1, codeLines[codeLines.length - 1].length());
+            Range range = new Range(startPosition, endPosition);
 
-                return List.of(new TextEdit(range, formattedCode));
-            } catch (Exception e) {
-                return List.of();
-            }
+            return List.of(new TextEdit(range, formattedCode));
         });
     }
 

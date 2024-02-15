@@ -33,7 +33,7 @@ public abstract class AbstractLexer {
         return lexemes;
     }
 
-    protected Position getPosition() {
+    protected Position  getPosition() {
         return new Position(offset, line, column);
     }
 
