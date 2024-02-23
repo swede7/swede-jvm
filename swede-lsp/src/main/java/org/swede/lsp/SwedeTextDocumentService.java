@@ -19,8 +19,10 @@ import java.util.concurrent.CompletableFuture;
 public class SwedeTextDocumentService implements TextDocumentService {
 
     private final LSClientLogger clientLogger;
+    private final SwedeLanguageServer swedeLanguageServer;
 
-    public SwedeTextDocumentService() {
+    public SwedeTextDocumentService(SwedeLanguageServer swedeLanguageServer) {
+        this.swedeLanguageServer = swedeLanguageServer;
         this.clientLogger = LSClientLogger.getInstance();
     }
 
@@ -75,19 +77,21 @@ public class SwedeTextDocumentService implements TextDocumentService {
     public CompletableFuture<List<? extends TextEdit>> formatting(DocumentFormattingParams params) {
         return CompletableFuture.supplyAsync(() -> {
             String code = CodeHolder.getCode();
+            String formattedCode;
             try {
-                String formattedCode = Formatter.format(code);
-
-                String[] codeLines = code.split("\\R");
-
-                Position startPosition = new Position(0, 0);
-                Position endPosition = new Position(codeLines.length - 1, codeLines[codeLines.length - 1].length());
-                Range range = new Range(startPosition, endPosition);
-
-                return List.of(new TextEdit(range, formattedCode));
-            } catch (Exception e) {
-                return List.of();
+                formattedCode = Formatter.format(code);
+            } catch (RuntimeException e) {
+                formattedCode = code;
+                swedeLanguageServer.getLanguageClient().showMessage(new MessageParams(MessageType.Error, e.getMessage()));
             }
+
+            String[] codeLines = code.split("\\R");
+
+            Position startPosition = new Position(0, 0);
+            Position endPosition = new Position(codeLines.length - 1, codeLines[codeLines.length - 1].length());
+            Range range = new Range(startPosition, endPosition);
+
+            return List.of(new TextEdit(range, formattedCode));
         });
     }
 
@@ -130,6 +134,38 @@ public class SwedeTextDocumentService implements TextDocumentService {
             } catch (Exception e) {
                 return new SemanticTokens(List.of());
             }
+        });
+    }
+
+    @Override
+    public CompletableFuture<DocumentDiagnosticReport> diagnostic(DocumentDiagnosticParams params) {
+        return CompletableFuture.supplyAsync(() -> {
+            String code = CodeHolder.getCode();
+            Lexer lexer = new Lexer(code);
+            Parser parser = new Parser(lexer.scan());
+
+            var parserResult = parser.parse();
+            var errors = parserResult.getErrors();
+
+            List<Diagnostic> diagnostics = new ArrayList<>();
+
+            for (var error : errors) {
+                var diagnostic = new Diagnostic();
+                diagnostic.setMessage(error.getMessage());
+
+                var range = new Range();
+                range.setStart(new Position(error.getStartPosition().line(), error.getStartPosition().column()));
+                range.setEnd(new Position(error.getEndPosition().line(), error.getEndPosition().column() + 1));
+                diagnostic.setRange(range);
+
+                diagnostics.add(diagnostic);
+            }
+
+
+            var relatedFullDocumentDiagnosticReport = new RelatedFullDocumentDiagnosticReport();
+            relatedFullDocumentDiagnosticReport.setItems(diagnostics);
+
+            return new DocumentDiagnosticReport(relatedFullDocumentDiagnosticReport);
         });
     }
 }

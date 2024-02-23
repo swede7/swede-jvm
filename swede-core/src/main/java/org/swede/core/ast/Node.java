@@ -36,7 +36,6 @@ public class Node {
         ROOT,
         UNEXPECTED,
         COMMENT,
-        DOCUMENT,
         SCENARIO,
         FEATURE,
         STEP,
@@ -49,5 +48,11 @@ public class Node {
 
     public void appendChild(Node node) {
         children.add(node);
+    }
+
+    public List<Node> getChildrenByType(NodeType type) {
+        return children.stream()
+                .filter(node -> node.getType() == type)
+                .toList();
     }
 }
