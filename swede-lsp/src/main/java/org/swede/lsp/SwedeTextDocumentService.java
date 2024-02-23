@@ -96,35 +96,6 @@ public class SwedeTextDocumentService implements TextDocumentService {
     }
 
     @Override
-    public CompletableFuture<DocumentDiagnosticReport> diagnostic(DocumentDiagnosticParams params) {
-        return CompletableFuture.supplyAsync(() -> {
-            String code = CodeHolder.getCode();
-
-            Lexer lexer = new Lexer(code);
-            Parser parser = new Parser(lexer.scan());
-            var parseResult = parser.parse();
-
-            var diagnosticItems = new ArrayList<Diagnostic>();
-
-            for (var error : parseResult.getErrors()) {
-                var diagnostic = new Diagnostic();
-                diagnostic.setSeverity(DiagnosticSeverity.Error);
-                diagnostic.setMessage(error.getMessage());
-
-                var startPos = error.getStartPosition();
-                var endPos = error.getEndPosition();
-                diagnostic.setRange(new Range(new Position(startPos.line(), startPos.column()), new Position(endPos.line(), endPos.column() + 1)));
-                diagnosticItems.add(diagnostic);
-            }
-
-            RelatedFullDocumentDiagnosticReport relatedFullDocumentDiagnosticReport = new RelatedFullDocumentDiagnosticReport();
-            relatedFullDocumentDiagnosticReport.setItems(diagnosticItems);
-            return new DocumentDiagnosticReport(relatedFullDocumentDiagnosticReport);
-        });
-    }
-
-
-    @Override
     public CompletableFuture<SemanticTokens> semanticTokensFull(SemanticTokensParams params) {
         return CompletableFuture.supplyAsync(() -> {
             try {
